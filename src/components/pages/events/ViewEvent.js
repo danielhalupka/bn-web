@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { Typography, withStyles, CardMedia } from "@material-ui/core";
+import { Typography, withStyles } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import PropTypes from "prop-types";
 import { observer } from "mobx-react";
@@ -22,6 +22,8 @@ import DateFlag from "../../elements/event/DateFlag";
 import SocialIconLink from "../../elements/social/SocialIconLink";
 import nl2br from "../../../helpers/nl2br";
 import Meta from "./Meta";
+
+import t from "../../../translations/translate";
 
 const styles = theme => ({
 	root: {},
@@ -289,7 +291,7 @@ class ViewEvent extends Component {
 					<Typography className={classes.eventSubCardSubText}>
 						{displayEventStartDate}
 						<br/>
-						Doors {displayDoorTime} - Show {displayShowTime}
+						Doors {displayDoorTime} - {t("SHOW_TIME")} {displayShowTime}
 						<br/>
 						{age_limit
 							? `This event is for over ${age_limit} year olds`
