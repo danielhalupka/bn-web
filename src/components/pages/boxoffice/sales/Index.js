@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Typography, withStyles } from "@material-ui/core";
 import { observer } from "mobx-react";
 
-import Bigneon from "../../../../helpers/bigneon";
 import notifications from "../../../../stores/notifications";
 import PageHeading from "../../../elements/PageHeading";
 import boxOffice from "../../../../stores/boxOffice";
@@ -13,11 +12,11 @@ import cart from "../../../../stores/cart";
 import PurchaseSuccessOptionsDialog from "./PurchaseSuccessOptionsDialog";
 import SuccessDialog from "./SuccessDialog";
 import InputWithButton from "../../../common/form/InputWithButton";
-import user from "../../../../stores/user";
 import NotFound from "../../../common/NotFound";
 import layout from "../../../../stores/layout";
 import BlankSlate from "../common/BlankSlate";
 import Loader from "../../../elements/loaders/Loader";
+import { onAddItemsToCart } from "../common/helpers";
 
 const styles = theme => ({
 	root: {},
@@ -64,20 +63,6 @@ class TicketSales extends Component {
 		boxOffice.refreshEventTickets();
 	}
 
-	async onAddItemsToCart(items) {
-		return new Promise(function(resolve, reject) {
-			Bigneon()
-				.cart.replace({ items, box_office_pricing: true })
-				.then(response => {
-					const { data } = response;
-					resolve({ result: data });
-				})
-				.catch(error => {
-					resolve({ error });
-				});
-		});
-	}
-
 	async onCheckout() {
 		const { selectedTickets, selectedHolds } = this.state;
 		const { holds } = boxOffice;
@@ -106,7 +91,7 @@ class TicketSales extends Component {
 			}
 		});
 
-		const { error } = await this.onAddItemsToCart(items);
+		const { error } = await onAddItemsToCart(items);
 		if (error) {
 			notifications.showFromErrorResponse({
 				error,
@@ -193,26 +178,18 @@ class TicketSales extends Component {
 				hold_type,
 				max_per_order,
 				ticket_type_id,
-				redemption_code
+				redemption_code,
+				price_in_cents,
+				ticket_type_name,
+				...rest
 			} = holds[id];
-
+			
 			if (holdCode && holdCode !== redemption_code) {
 				return null;
 			}
 
-			const ticketType = ticketTypes[ticket_type_id];
-			const { ticket_pricing } = ticketType;
-
-			let disabled = false;
-			let discountedPrice = 0;
-
-			if (!ticket_pricing) {
-				//No active price point
-				disabled = true;
-			} else {
-				const { price_in_cents } = ticket_pricing;
-				discountedPrice = price_in_cents - discount_in_cents;
-			}
+			const disabled = false;
+			const discountedPrice = price_in_cents - discount_in_cents;
 
 			return (
 				<TicketRow
@@ -352,6 +329,7 @@ class TicketSales extends Component {
 							onClose={() => this.setState({ showCheckoutModal: false })}
 							ticketTypes={ticketTypes || {}}
 							onSuccess={this.onCheckoutSuccess.bind(this)}
+							onError={() => this.setState({ isAddingToCart: false })}
 						/>
 
 						<PurchaseSuccessOptionsDialog
