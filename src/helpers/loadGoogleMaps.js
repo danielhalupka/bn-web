@@ -1,6 +1,6 @@
 let isAppended;
 
-export const loadGoogleMaps = () => {
+export default () => {
 	if (!isAppended) {
 		//Load the google API here because we need the a .env var
 		if (!process.env.REACT_APP_GOOGLE_PLACES_API_KEY) {
@@ -21,4 +21,3 @@ export const loadGoogleMaps = () => {
 	}
 };
 
-export default loadGoogleMaps;
