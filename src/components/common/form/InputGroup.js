@@ -118,7 +118,8 @@ const InputGroup = props => {
 				onFocus={onFocus}
 				InputProps={{
 					...InputProps,
-					classes: inputPropClasses
+					classes: inputPropClasses,
+					style: type !== "number" ? { paddingBottom: 1 } : {} //A total mystery but the underline in inputs is lower by 1px for numbers
 				}}
 				InputLabelProps={{
 					shrink: true
