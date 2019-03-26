@@ -91,6 +91,8 @@
     "google": false,
     "Promise": false,
     "cloudinary": false,
-    "branch": false
+    "branch": false,
+	"jsPDF": false,
+	"html2canvas": false
   }
 }

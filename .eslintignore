@@ -3,3 +3,4 @@ node_modules/*
 build/*
 config/polyfills.js
 public/site/js/*
+public/scripts/*

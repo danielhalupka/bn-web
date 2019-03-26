@@ -80,6 +80,8 @@ class TicketDialog extends React.Component {
 
 		const iconUrl = "/icons/tickets-white.svg";
 
+		const redeemable = ticket && ticket.redeem_key;
+
 		return (
 			<Dialog
 				onClose={onClose}
@@ -88,7 +90,7 @@ class TicketDialog extends React.Component {
 				{...other}
 			>
 				<div className={classes.content}>
-					<Typography variant="subheading">
+					<Typography>
 						Scanning this redeems the ticket.
 					</Typography>
 					{qrText ? (
@@ -99,7 +101,7 @@ class TicketDialog extends React.Component {
 								justifyContent: "center"
 							}}
 						>
-							<QRCode size={300} fgColor={primaryHex} value={qrText}/>
+							{redeemable ? <QRCode size={300} fgColor={primaryHex} value={qrText}/> : null}
 						</div>
 					) : (
 						<Loader/>

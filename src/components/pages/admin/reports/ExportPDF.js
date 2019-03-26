@@ -16,6 +16,7 @@ import TicketCounts from "./counts/TicketCounts";
 import Audit from "./eventAudit/Audit";
 import SummaryAudit from "./eventSummaryAudit/SummaryAudit";
 import user from "../../../../stores/user";
+import { loadJsPDF } from "../../../../helpers/jsPDF";
 
 const styles = theme => ({
 	root: {
@@ -70,11 +71,17 @@ class ExportPDF extends Component {
 		this.state = {
 			event: null,
 			venue: null,
-			displayEventStartDate: null
+			displayEventStartDate: null,
+			jsPDFLoaded: false,
+			containerStyle: {}
 		};
 	}
 
 	componentDidMount() {
+		loadJsPDF(() => {
+			this.setState({ jsPDFLoaded: true });
+		});
+
 		const id = getUrlParam("event_id");
 
 		if (id) {
@@ -100,17 +107,55 @@ class ExportPDF extends Component {
 					});
 				});
 		}
+	}
 
+	createAndDownloadPDF() {
+		const filename = `${getUrlParam("type")}-${Math.floor(Date.now() / 1000)}.pdf`;
+
+		const pdf = new jsPDF("l","pt","a4");
+		const width = pdf.internal.pageSize.getWidth();
+
+		this.setState({ containerStyle: { width } }, () => {
+			const source = document.getElementById("export-container");
+
+			//TODO Works but just saves an image which won't work for multi page reports
+			// html2canvas(source).then(canvas => {
+			// 	const pdf = new jsPDF("l", "pt", "a4");
+			// 	pdf.addImage(canvas.toDataURL("image/jpeg"), "JPEG", 10, 10, 800, 300);
+			// 	pdf.save("html2canvas.pdf");
+			// });
+
+			pdf.html(source,
+				{
+
+					// overlay: null,
+					// canvas: null,
+					// img: null,
+					pdf: null,
+					pageSize: null,
+
+					callback: (pdf) => {
+						//pdf.output("dataurlnewwindow");
+
+						pdf.save(filename);
+						//window.close();
+
+						this.setState({ containerStyle: {} });
+					}
+				});
+		});
 	}
 
 	onReportLoad() {
-		window.print();
+		this.createAndDownloadPDF();
+		//window.print();
 	}
 
 	render() {
+		const { jsPDFLoaded, containerStyle } = this.state;
 		const organizationId = user.currentOrganizationId;
 
-		if (!organizationId) {
+		if (!organizationId || !jsPDFLoaded) {
 			return <Loader/>;
 		}
 
@@ -154,12 +199,14 @@ class ExportPDF extends Component {
 					</div>
 				</div>
 
-				<ReportComponent
-					organizationId={organizationId}
-					eventId={event_id}
-					printVersion
-					onLoad={this.onReportLoad}
-				/>
+				<div id={"export-container"} style={containerStyle}>
+					<ReportComponent
+						organizationId={organizationId}
+						eventId={event_id}
+						printVersion
+						onLoad={this.onReportLoad.bind(this)}
+					/>
+				</div>
 			</div>
 		);
 	}
