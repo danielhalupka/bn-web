@@ -6,7 +6,7 @@ import {
 	Typography,
 	InputAdornment,
 	Collapse,
-	Hidden
+	Hidden, Grid
 } from "@material-ui/core";
 import classnames from "classnames";
 
@@ -46,26 +46,16 @@ const styles = theme => {
 			textTransform: "uppercase",
 			fontFamily: "TTCommons-DemiBold"
 		},
-		simpleInputs: {
-			display: "flex"
-		},
-		simpleInputContainer: {
-			flex: 1,
+		simpleInputsContainer: {
 			paddingRight: theme.spacing.unit * 4,
-
 			[theme.breakpoints.down("sm")]: {
 				paddingRight: theme.spacing.unit
 			}
 		},
-		additionalInputsRow: {
-			display: "flex"
-		},
-		additionalInputContainer: {
-			flex: 1,
+		additionalInputsContainer: {
 			paddingRight: theme.spacing.unit * 4,
 			display: "flex",
 			alignItems: "center",
-
 			[theme.breakpoints.down("sm")]: {
 				paddingRight: theme.spacing.unit
 			}
@@ -194,8 +184,8 @@ const TicketDetails = observer(props => {
 		<div className={classes.activeContent}>
 			<TicketHeading {...props}/>
 
-			<div className={classes.simpleInputs}>
-				<div className={classes.simpleInputContainer} style={{ flex: 2 }}>
+			<Grid className={classes.simpleInputsContainer} container spacing={16}>
+				<Grid item xs={12} sm={12} md={6} lg={6}>
 					<InputGroup
 						disabled={isCancelled}
 						error={errors.name}
@@ -209,9 +199,8 @@ const TicketDetails = observer(props => {
 						}}
 						onBlur={validateFields}
 					/>
-				</div>
-
-				<div className={classes.simpleInputContainer}>
+				</Grid>
+				<Grid item xs={12} sm={6} md={3} lg={3}>
 					<InputGroup
 						disabled={isCancelled}
 						error={errors.capacity}
@@ -225,9 +214,8 @@ const TicketDetails = observer(props => {
 						}}
 						onBlur={validateFields}
 					/>
-				</div>
-
-				<div className={classes.simpleInputContainer}>
+				</Grid>
+				<Grid item xs={12} sm={6} md={3} lg={3}>
 					<InputGroup
 						disabled={isCancelled}
 						InputProps={{
@@ -246,8 +234,8 @@ const TicketDetails = observer(props => {
 						}}
 						onBlur={validateFields}
 					/>
-				</div>
-			</div>
+				</Grid>
+			</Grid>
 
 			{!showAdditionalOptions ? (
 				<div>
@@ -269,8 +257,8 @@ const TicketDetails = observer(props => {
 			) : null}
 
 			<Collapse in={!!showAdditionalOptions}>
-				<div className={classes.additionalInputsRow}>
-					<div className={classes.additionalInputContainer}>
+				<Grid className={classes.additionalInputsContainer} container spacing={16}>
+					<Grid item xs={12} sm={12} md={6} lg={6}>
 						<DateTimePickerGroup
 							disabled={isCancelled}
 							error={errors.startDate}
@@ -282,8 +270,8 @@ const TicketDetails = observer(props => {
 							onBlur={validateFields}
 							minDate={false}
 						/>
-					</div>
-					<div className={classes.additionalInputContainer}>
+					</Grid>
+					<Grid item xs={12} sm={12} md={6} lg={6}>
 						<DateTimePickerGroup
 							disabled={isCancelled}
 							error={errors.startTime}
@@ -295,13 +283,9 @@ const TicketDetails = observer(props => {
 							onBlur={validateFields}
 							minDate={false}
 						/>
-					</div>
-				</div>
-				<div className={classes.additionalInputsRow}>
-					<div
-						className={classes.additionalInputContainer}
-						style={{ marginBottom: 10 }}
-					>
+					</Grid>
+
+					<Grid item xs={12} sm={12} md={12} lg={12}>
 						<SelectGroup
 							disabled={isCancelled}
 							value={saleEndTimeOption || "close"}
@@ -317,26 +301,29 @@ const TicketDetails = observer(props => {
 								updateTicketType(index, { saleEndTimeOption: e.target.value });
 							}}
 						/>
-					</div>
-				</div>
+					</Grid>
+				</Grid>
+
 				{saleEndTimeOption === "custom" ? (
-					<div className={classes.additionalInputsRow}>
-						<div className={classes.additionalInputContainer}>
-							<DateTimePickerGroup
-								disabled={isCancelled}
-								error={errors.endDate}
-								value={useEndDate}
-								name="endDate"
-								type="date"
-								label="Sale end date *"
-								onChange={endDate => {
-									updateTicketType(index, { endDate });
-								}}
-								onBlur={validateFields}
-								minDate={false}
-							/>
-						</div>
-						<div className={classes.additionalInputContainer}>
+					<Grid className={classes.additionalInputsContainer} container spacing={16}>
+						<Grid item xs={12} sm={12} md={6} lg={6}>
+							<div className={classes.additionalInputContainer}>
+								<DateTimePickerGroup
+									disabled={isCancelled}
+									error={errors.endDate}
+									value={useEndDate}
+									name="endDate"
+									type="date"
+									label="Sale end date *"
+									onChange={endDate => {
+										updateTicketType(index, { endDate });
+									}}
+									onBlur={validateFields}
+									minDate={false}
+								/>
+							</div>
+						</Grid>
+						<Grid item xs={12} sm={12} md={6} lg={6}>
 							<DateTimePickerGroup
 								disabled={isCancelled}
 								error={errors.endTime}
@@ -350,12 +337,12 @@ const TicketDetails = observer(props => {
 								onBlur={validateFields}
 								minDate={false}
 							/>
-						</div>
-					</div>
+						</Grid>
+					</Grid>
 				) : null}
 
-				<div className={classes.additionalInputsRow}>
-					<div className={classes.additionalInputContainer}>
+				<Grid className={classes.additionalInputsContainer} container spacing={16}>
+					<Grid item xs={12} sm={12} md={4} lg={4}>
 						<InputGroup
 							disabled={isCancelled}
 							InputProps={{
@@ -374,8 +361,8 @@ const TicketDetails = observer(props => {
 							}}
 							onBlur={validateFields}
 						/>
-					</div>
-					<div className={classes.additionalInputContainer}>
+					</Grid>
+					<Grid item xs={12} sm={12} md={4} lg={4}>
 						<InputGroup
 							disabled={isCancelled}
 							error={errors.limitPerPerson}
@@ -391,11 +378,8 @@ const TicketDetails = observer(props => {
 							}}
 							onBlur={validateFields}
 						/>
-					</div>
-				</div>
-
-				<div className={classes.additionalInputsRow}>
-					<div className={classes.additionalInputContainer}>
+					</Grid>
+					<Grid item xs={12} sm={12} md={4} lg={4}>
 						<InputGroup
 							disabled={isCancelled}
 							error={errors.increment}
@@ -409,9 +393,8 @@ const TicketDetails = observer(props => {
 							}}
 							onBlur={validateFields}
 						/>
-					</div>
-
-					<div className={classes.additionalInputContainer}>
+					</Grid>
+					<Grid item xs={12} sm={12} md={12} lg={12}>
 						<InputGroup
 							disabled={isCancelled}
 							error={errors.description}
@@ -425,10 +408,9 @@ const TicketDetails = observer(props => {
 							}}
 							onBlur={validateFields}
 						/>
-					</div>
-				</div>
-				<div className={classes.additionalInputsRow}>
-					<div className={classes.additionalInputContainer}>
+					</Grid>
+
+					<Grid item xs={12} sm={12} md={6} lg={6}>
 						<SelectGroup
 							disabled={isCancelled}
 							value={soldOutBehavior || "showSoldOut"}
@@ -442,8 +424,8 @@ const TicketDetails = observer(props => {
 								updateTicketType(index, { soldOutBehavior: e.target.value });
 							}}
 						/>
-					</div>
-					<div className={classes.additionalInputContainer}>
+					</Grid>
+					<Grid item xs={12} sm={12} md={6} lg={6} style={{ display: "flex", justifyContent: "flex-end" }}>
 						<CheckBox
 							disabled={isCancelled}
 							name={"is_private"}
@@ -454,8 +436,8 @@ const TicketDetails = observer(props => {
 						>
 							Private (Can only be sold via holds)
 						</CheckBox>
-					</div>
-				</div>
+					</Grid>
+				</Grid>
 
 				{!showPricing && !isCancelled ? (
 					<div>
@@ -524,7 +506,6 @@ const TicketDetails = observer(props => {
 					) :
 						null
 					}
-
 				</Collapse>
 			</Collapse>
 		</div>
