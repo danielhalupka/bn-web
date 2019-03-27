@@ -177,6 +177,8 @@ const TicketDetails = observer(props => {
 		}
 	}
 
+	const saleStartTimeOption = "pegged"; //TODO this will come from the API
+
 	const onShowAdditionalOptions = () =>
 		updateTicketType(index, { showAdditionalOptions: true });
 
@@ -258,33 +260,55 @@ const TicketDetails = observer(props => {
 
 			<Collapse in={!!showAdditionalOptions}>
 				<Grid className={classes.additionalInputsContainer} container spacing={16}>
-					<Grid item xs={12} sm={12} md={6} lg={6}>
-						<DateTimePickerGroup
+					<Grid item xs={12} sm={12} md={12} lg={12}>
+						<SelectGroup
 							disabled={isCancelled}
-							error={errors.startDate}
-							value={startDate}
-							name="startDate.date"
-							label="Sale start date *"
-							type="date"
-							onChange={startDate => updateTicketType(index, { startDate })}
-							onBlur={validateFields}
-							minDate={false}
+							value={saleStartTimeOption || "pegged"}
+							items={[
+								{ value: "pegged", label: "When ticket sales end for another ticket" },
+								{ value: "custom", label: "Custom" }
+							]}
+							name={"close-times"}
+							label={"Ticket sale start time *"}
+							onChange={e => {
+								// updateTicketType(index, { saleStartTimeOption: e.target.value });
+							}}
 						/>
 					</Grid>
-					<Grid item xs={12} sm={12} md={6} lg={6}>
-						<DateTimePickerGroup
-							disabled={isCancelled}
-							error={errors.startTime}
-							value={startTime}
-							name="startTime"
-							label="Sale start time *"
-							type="time"
-							onChange={startTime => updateTicketType(index, { startTime })}
-							onBlur={validateFields}
-							minDate={false}
-						/>
-					</Grid>
+				</Grid>
 
+				{saleStartTimeOption === "custom" ? (
+					<Grid className={classes.additionalInputsContainer} container spacing={16}>
+						<Grid item xs={12} sm={12} md={6} lg={6}>
+							<DateTimePickerGroup
+								disabled={isCancelled}
+								error={errors.startDate}
+								value={startDate}
+								name="startDate.date"
+								label="Sale start date *"
+								type="date"
+								onChange={startDate => updateTicketType(index, { startDate })}
+								onBlur={validateFields}
+								minDate={false}
+							/>
+						</Grid>
+						<Grid item xs={12} sm={12} md={6} lg={6}>
+							<DateTimePickerGroup
+								disabled={isCancelled}
+								error={errors.startTime}
+								value={startTime}
+								name="startTime"
+								label="Sale start time *"
+								type="time"
+								onChange={startTime => updateTicketType(index, { startTime })}
+								onBlur={validateFields}
+								minDate={false}
+							/>
+						</Grid>
+					</Grid>
+				) : null}
+
+				<Grid className={classes.additionalInputsContainer} container spacing={16}>
 					<Grid item xs={12} sm={12} md={12} lg={12}>
 						<SelectGroup
 							disabled={isCancelled}
