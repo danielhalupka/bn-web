@@ -151,7 +151,7 @@ const endAtTimeOptions = [
 			if (!endAt) {
 				return null;
 			}
-			
+
 			return moment
 				.utc(endAt)
 				.format(moment.HTML5_FMT.DATETIME_LOCAL_MS);
@@ -459,7 +459,7 @@ class HoldDialog extends React.Component {
 		if (!hold.endAtTimeKey || hold.endAtTimeKey !== "custom") {
 			return null;
 		}
-		
+
 		const { endAt } = hold;
 
 		return (
