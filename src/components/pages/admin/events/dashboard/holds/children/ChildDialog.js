@@ -1,14 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
-import moment from "moment";
 import BnServer from "bn-api-node/dist/bundle.client";
 
-import notifications from "../../../../../../stores/notifications";
-import Button from "../../../../../elements/Button";
-import Bigneon from "../../../../../../helpers/bigneon";
-import Dialog from "../../../../../elements/Dialog";
-import InputGroup from "../../../../../common/form/InputGroup";
+import notifications from "../../../../../../../stores/notifications";
+import Button from "../../../../../../elements/Button";
+import Bigneon from "../../../../../../../helpers/bigneon";
+import Dialog from "../../../../../../elements/Dialog";
+import InputGroup from "../../../../../../common/form/InputGroup";
 
 const createHold = BnServer.ResourceInterfaces.createHold;
 
@@ -19,16 +18,16 @@ const styles = {
 	}
 };
 
-class CompDialog extends React.Component {
+class ChildDialog extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			comp: {
+			child: {
 				hold_id: this.props.holdId,
 				name: "",
 				phone: "",
 				email: "",
-				quantity: 0,
+				quantity: 1,
 				redemption_code: ""
 			},
 			hold: createHold(),
@@ -37,40 +36,79 @@ class CompDialog extends React.Component {
 		};
 	}
 
-	componentWillMount(nextProps) {
-		// this.loadHold();
+	componentDidMount() {
+		this.loadHold();
 	}
 
 	loadHold() {
-		const { holdId, eventId } = this.props;
+		const { holdId } = this.props;
 
-		if (holdId) {
-			//Load the hold
-			Bigneon()
-				.holds.read({ id: holdId })
-				.then(holdData => {
-					const hold = holdData.data;
-					this.setState({ hold });
+		//Load the hold
+		Bigneon()
+			.holds.read({ id: holdId })
+			.then(response => {
+				const hold = response.data;
+				this.setState({ hold });
+			}).catch(error => {
+				notifications.showFromErrorResponse({
+					error,
+					defaultMessage: "Failed to load hold."
 				});
-		} else {
-			this.setState({
-				hold: createHold({
-					event_id: eventId,
-					end_at: moment()
-						.add(1, "year")
-						.format(moment.HTML5_FMT.DATETIME_LOCAL_MS)
-				})
 			});
+	}
+
+	validateFields() {
+		if (this.hasSubmitted) {
+			const errors = {};
+
+			const { child } = this.state;
+
+			const { name, quantity, redemption_code } = child;
+
+			console.log(name);
+
+			if (!name) {
+				errors.name = "Name required.";
+			}
+
+			if (!redemption_code) {
+				errors.redemption_code = "Redemption code required.";
+			}
+
+			if (!quantity) {
+				errors.quantity = "Quantity required.";
+			}
+
+			console.log(errors);
+
+			if (Object.keys(errors).length > 0) {
+				this.setState({ errors });
+				return false;
+			}
 		}
+
+		this.setState({ errors: {} });
+
+		return true;
 	}
 
 	submit() {
-		const { comp } = this.state;
+		this.hasSubmitted = true;
+
+		if (!this.validateFields()) {
+			notifications.show({
+				variant: "warning",
+				message: "There are invalid details."
+			});
+			return false;
+		}
+
+		const { child, hold } = this.state;
 		const { onSuccess } = this.props;
 
 		this.setState({ isSubmitting: true });
 
-		const { ...saveData } = comp;
+		const { ...saveData } = child;
 		if (saveData.email === "") {
 			delete saveData.email;
 		}
@@ -78,12 +116,15 @@ class CompDialog extends React.Component {
 			delete saveData.phone;
 		}
 
+		const { id, hold_type, discount_in_cents, max_per_order, end_at } = hold;
+		const parentHoldInheritance = { id, hold_type, discount_in_cents, max_per_order, end_at };
+
 		Bigneon()
-			.holds.comps.create(saveData)
+			.holds.children.create({ ...parentHoldInheritance, ...saveData })
 			.then(response => {
 				const { id } = response.data;
 				this.setState({ isSubmitting: false });
-				const message = `Successfully ${comp.id ? "updated" : "created"} comp`;
+				const message = `Successfully ${child.id ? "updated" : "added"} name`;
 				notifications.show({
 					message,
 					variant: "success"
@@ -96,7 +137,7 @@ class CompDialog extends React.Component {
 
 				notifications.showFromErrorResponse({
 					error,
-					defaultMessage: `${comp.id ? "Update" : "Create"} comp list failed.`
+					defaultMessage: `${child.id ? "Update" : "Create"} name failed.`
 				});
 			});
 	}
@@ -114,9 +155,8 @@ class CompDialog extends React.Component {
 
 		const iconUrl = "/icons/tickets-white.svg";
 
-		const { comp, errors } = this.state;
+		const { child, errors } = this.state;
 
-		const isSubmitting = false;
 		return (
 			<Dialog
 				onClose={onClose}
@@ -127,21 +167,21 @@ class CompDialog extends React.Component {
 				<div>
 					<InputGroup
 						error={errors.name}
-						value={comp.name}
+						value={child.name}
 						name="name"
-						label={"Name"}
+						label={"Name *"}
 						placeholder="- Please enter name"
 						autofocus={true}
 						type="text"
 						onChange={e => {
-							comp.name = e.target.value;
-							this.setState({ comp });
+							child.name = e.target.value;
+							this.setState({ child });
 						}}
 						// onBlur={this.validateFields.bind(this)}
 					/>
 					<InputGroup
 						error={errors.contact}
-						value={comp.email || comp.phone}
+						value={child.email || child.phone}
 						name="email"
 						label="Mobile Number or Email Address"
 						placeholder="- Enter share method (optional)"
@@ -149,41 +189,41 @@ class CompDialog extends React.Component {
 						onChange={e => {
 							const value = e.target.value.trim();
 							if (value.indexOf("@") !== -1) {
-								comp.email = value;
-								comp.phone = "";
+								child.email = value;
+								child.phone = "";
 							} else {
-								comp.email = "";
-								comp.phone = value;
+								child.email = "";
+								child.phone = value;
 							}
-							this.setState({ comp });
+							this.setState({ child });
 						}}
 						// onBlur={this.validateFields.bind(this)}
 					/>
 
 					<InputGroup
 						error={errors.redemption_code}
-						value={comp.redemption_code}
+						value={child.redemption_code}
 						name="redemption_code"
-						label="Redemption code"
+						label="Redemption code *"
 						placeholder="Please enter a code (min 6 chars)"
 						type="text"
 						onChange={e => {
-							comp.redemption_code = e.target.value.toUpperCase();
-							this.setState({ comp });
+							child.redemption_code = e.target.value.toUpperCase();
+							this.setState({ child });
 						}}
 						// onBlur={this.validateFields.bind(this)}
 					/>
 
 					<InputGroup
 						error={errors.quantity}
-						value={comp.quantity}
+						value={child.quantity}
 						name="quantity"
 						label="Total Tickets"
 						placeholder="1"
 						type="text"
 						onChange={e => {
-							comp.quantity = +e.target.value;
-							this.setState({ comp });
+							child.quantity = +e.target.value;
+							this.setState({ child });
 						}}
 						// onBlur={this.validateFields.bind(this)}
 					/>
@@ -211,13 +251,13 @@ class CompDialog extends React.Component {
 	}
 }
 
-CompDialog.propTypes = {
+ChildDialog.propTypes = {
 	classes: PropTypes.object.isRequired,
-	holdId: PropTypes.string,
+	holdId: PropTypes.string.isRequired,
 	eventId: PropTypes.string,
 	ticketTypes: PropTypes.array,
 	onClose: PropTypes.func.isRequired,
 	onSuccess: PropTypes.func.isRequired
 };
 
-export default withStyles(styles)(CompDialog);
+export default withStyles(styles)(ChildDialog);

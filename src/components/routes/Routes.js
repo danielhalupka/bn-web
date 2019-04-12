@@ -45,8 +45,8 @@ const AdminArtist = asyncComponent(() => import("../pages/admin/artists/Artist")
 const AdminEventsList = asyncComponent(() => import("../pages/admin/events/List"));
 const AdminEventDashboardSummary = asyncComponent(() => import("../pages/admin/events/dashboard/Summary"));
 const AdminEventDashboardHolds = asyncComponent(() => import("../pages/admin/events/dashboard/holds/List"));
+const AdminEventDashboardHoldChildren = asyncComponent(() => import("../pages/admin/events/dashboard/holds/children/List"));
 const AdminEventDashboardCodes = asyncComponent(() => import("../pages/admin/events/dashboard/codes/List"));
-const AdminEventDashboardComps = asyncComponent(() => import("../pages/admin/events/dashboard/comps/List"));
 const AdminEventDashboardReports = asyncComponent(() => import("../pages/admin/events/dashboard/reports/Index"));
 const AdminEventDashboardMarketing = asyncComponent(() => import("../pages/admin/events/dashboard/marketing/Index"));
 const AdminEventExportGuestList = asyncComponent(() => import("../pages/admin/events/dashboard/guests/Export"));
@@ -292,8 +292,8 @@ class Routes extends Component {
 								/>
 								<PrivateRoute
 									exact
-									path="/admin/events/:id/dashboard/comps/:holdId"
-									component={AdminEventDashboardComps}
+									path="/admin/events/:id/dashboard/holds/:holdId"
+									component={AdminEventDashboardHoldChildren}
 									isAuthenticated={isAuthenticated}
 								/>
 								<PrivateRoute

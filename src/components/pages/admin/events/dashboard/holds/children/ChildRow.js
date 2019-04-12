@@ -38,7 +38,7 @@ const styles = theme => {
 	};
 };
 
-const CompRow = props => {
+const ChildRow = props => {
 	const { heading, gray, active, children, classes, actions, ...rest } = props;
 
 	const columnStyles = [
@@ -98,7 +98,7 @@ const CompRow = props => {
 	);
 };
 
-CompRow.propTypes = {
+ChildRow.propTypes = {
 	classes: PropTypes.object.isRequired,
 	children: PropTypes.array.isRequired,
 	gray: PropTypes.bool,
@@ -107,4 +107,4 @@ CompRow.propTypes = {
 	actions: PropTypes.array
 };
 
-export default withStyles(styles)(CompRow);
+export default withStyles(styles)(ChildRow);

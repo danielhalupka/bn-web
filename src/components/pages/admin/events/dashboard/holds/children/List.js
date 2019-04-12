@@ -1,21 +1,21 @@
 import React, { Component } from "react";
 import { Typography, withStyles, CardMedia } from "@material-ui/core";
 
-import notifications from "../../../../../../stores/notifications";
-import Button from "../../../../../elements/Button";
-import Bigneon from "../../../../../../helpers/bigneon";
-import Divider from "../../../../../common/Divider";
-import HoldRow from "./CompRow";
-import CompDialog from "./CompDialog";
-import Container from "../Container";
-import Loader from "../../../../../elements/loaders/Loader";
-import user from "../../../../../../stores/user";
+import notifications from "../../../../../../../stores/notifications";
+import Button from "../../../../../../elements/Button";
+import Bigneon from "../../../../../../../helpers/bigneon";
+import Divider from "../../../../../../common/Divider";
+import HoldRow from "./ChildRow";
+import ChildDialog from "./ChildDialog";
+import Container from "../../Container";
+import Loader from "../../../../../../elements/loaders/Loader";
+import user from "../../../../../../../stores/user";
 
 const styles = theme => ({
 	root: {}
 });
 
-class CompList extends Component {
+class ChildrenList extends Component {
 	constructor(props) {
 		super(props);
 
@@ -26,20 +26,26 @@ class CompList extends Component {
 			activeHoldId: null, //TODO check this is not used and remove if not
 			showDialog: null,
 			ticketTypes: [],
-			comps: [],
+			children: [],
 			holdDetails: {}
 		};
 	}
 
 	componentDidMount() {
 		this.loadEventDetails();
-		this.loadHoldDetails();
-		this.refreshComps();
-	}
 
-	async loadHoldDetails() {
-		const holdDetails = (await Bigneon().holds.read({ id: this.holdId })).data;
-		this.setState({ holdDetails });
+		Bigneon()
+			.holds.read({ id: this.holdId })
+			.then(response => {
+				const holdDetails = response.data;
+				this.setState({ holdDetails }, () => this.refreshChildren());
+
+			}).catch(error => {
+				notifications.showFromErrorResponse({
+					error,
+					defaultMessage: "Failed to load holds."
+				});
+			});
 	}
 
 	loadEventDetails() {
@@ -62,18 +68,17 @@ class CompList extends Component {
 			});
 	}
 
-	refreshComps() {
+	refreshChildren() {
 		if (this.eventId && this.holdId) {
-			Bigneon()
-				.holds.comps.index({ hold_id: this.holdId })
-				.then(comps => {
+			Bigneon().holds.children.index({ hold_id: this.holdId })
+				.then(response => {
 					//TODO Pagination
-					this.setState({ comps: comps.data.data });
+					this.setState({ children: response.data.data });
 				})
 				.catch(error => {
 					notifications.showFromErrorResponse({
 						error,
-						defaultMessage: "Refreshing comps failed."
+						defaultMessage: "Refreshing holds failed."
 					});
 				});
 		}
@@ -82,19 +87,19 @@ class CompList extends Component {
 	onAddHold() {
 		this.setState({
 			activeHoldId: null,
-			showDialog: "-1"
+			showDialog: false
 		});
 	}
 
 	renderList() {
-		const { comps, hoverId } = this.state;
+		const { children, hoverId } = this.state;
 		const { classes } = this.props;
 
-		if (comps === null) {
+		if (children === null) {
 			return <Loader/>;
 		}
 
-		if (comps && comps.length > 0) {
+		if (children && children.length > 0) {
 			const ths = [
 				"Name",
 				"Code",
@@ -118,7 +123,7 @@ class CompList extends Component {
 			return (
 				<div>
 					<HoldRow heading>{ths}</HoldRow>
-					{comps.map((ticket, index) => {
+					{children.map((ticket, index) => {
 						const {
 							id,
 							name,
@@ -174,7 +179,7 @@ class CompList extends Component {
 				</div>
 			);
 		} else {
-			return <Typography variant="body1">No comps created yet</Typography>;
+			return <Typography variant="body1">No names added yet</Typography>;
 		}
 	}
 
@@ -183,13 +188,13 @@ class CompList extends Component {
 		const eventId = this.eventId;
 		const holdId = this.holdId;
 		return (
-			<CompDialog
+			<ChildDialog
 				open={true}
 				eventId={eventId}
 				holdId={holdId}
 				ticketTypes={ticketTypes}
 				onSuccess={id => {
-					this.refreshComps();
+					this.refreshChildren();
 					this.setState({ showDialog: null });
 				}}
 				onClose={() => this.setState({ showDialog: null })}
@@ -208,7 +213,7 @@ class CompList extends Component {
 				<div style={{ display: "flex" }}>
 					<Typography variant="title">{holdDetails.name}</Typography>
 					<span style={{ flex: 1 }}/>
-					{user.hasScope("comp:write") ? (
+					{user.hasScope("hold:write") ? (
 						<Button onClick={e => this.onAddHold()}>Assign Name To List</Button>
 					) : (
 						<span/>
@@ -223,4 +228,4 @@ class CompList extends Component {
 	}
 }
 
-export default withStyles(styles)(CompList);
+export default withStyles(styles)(ChildrenList);

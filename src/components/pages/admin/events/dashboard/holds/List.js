@@ -77,9 +77,15 @@ class TicketHoldList extends Component {
 	refreshHolds() {
 		Bigneon()
 			.events.holds.index({ event_id: this.eventId })
-			.then(holds => {
-				//TODO Pagination
-				this.setState({ holds: holds.data.data });
+			.then(response => {
+				const holds = response.data.data; //TODO Pagination
+
+				this.setState({ holds });
+			}).catch(error => {
+				notifications.showFromErrorResponse({
+					error,
+					defaultMessage: "Failed to load holds."
+				});
 			});
 	}
 
@@ -154,24 +160,35 @@ class TicketHoldList extends Component {
 			return (
 				<div>
 					<HoldRow heading>{ths}</HoldRow>
-					{holds.map((ticket, index) => {
+					{holds.map((hold, index) => {
 						const {
 							id,
 							name,
 							redemption_code,
 							hold_type,
 							quantity,
-							available
-						} = ticket;
+							available,
+							parent_hold_id,
+							...rest
+						} = hold;
+						
+						let nameField = name;
+
+						//Only show links to name list if it's not a child of another list
+						if (!parent_hold_id) {
+							nameField = (
+								<StyledLink
+									underlined
+									key={id}
+									to={`/admin/events/${this.eventId}/dashboard/holds/${id}`}
+								>
+									{name}
+								</StyledLink>
+							);
+						}
 
 						const tds = [
-							<StyledLink
-								underlined
-								key={id}
-								to={`/admin/events/${this.eventId}/dashboard/comps/${id}`}
-							>
-								{name}
-							</StyledLink>,
+							nameField,
 							redemption_code,
 							hold_type,
 							quantity - available,
@@ -182,8 +199,6 @@ class TicketHoldList extends Component {
 						const iconColor = active ? "white" : "gray";
 						return (
 							<HoldRow
-								// onMouseEnter={e => this.setState({ hoverId: id })}
-								// onMouseLeave={e => this.setState({ hoverId: null })}
 								active={active}
 								gray={!(index % 2)}
 								key={id}
