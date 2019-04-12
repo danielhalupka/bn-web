@@ -171,7 +171,7 @@ class TicketHoldList extends Component {
 							parent_hold_id,
 							...rest
 						} = hold;
-						
+
 						let nameField = name;
 
 						//Only show links to name list if it's not a child of another list

@@ -87,7 +87,7 @@ class ChildrenList extends Component {
 	onAddHold() {
 		this.setState({
 			activeHoldId: null,
-			showDialog: false
+			showDialog: true
 		});
 	}
 
