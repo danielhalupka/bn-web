@@ -206,7 +206,7 @@ class SelectedEvent {
 						onError();
 
 						notifications.show({
-							message: "Promo code is valid but ticket is currently unavailable.",
+							message: "Code is valid but no eligible tickets are available.",
 							variant: "warning"
 						});
 
