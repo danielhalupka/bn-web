@@ -67,7 +67,9 @@ const createHoldForInput = (values = {}) => {
 			: "",
 		maxPerUser: max_per_user || "",
 		endAtTimeKey: end_at ? "custom" : "never", //TODO get the correct value based on the current event's dates
-		endAt: end_at ? moment.utc(end_at, moment.HTML5_FMT.DATETIME_LOCAL_MS).local() : null,
+		endAt: end_at
+			? moment.utc(end_at, moment.HTML5_FMT.DATETIME_LOCAL_MS).local()
+			: null,
 		...values
 	};
 };
@@ -108,7 +110,9 @@ const endAtTimeOptions = [
 				return null;
 			}
 
-			const eventDate = moment.utc(event_start, moment.HTML5_FMT.DATETIME_LOCAL_MS).local();
+			const eventDate = moment
+				.utc(event_start, moment.HTML5_FMT.DATETIME_LOCAL_MS)
+				.local();
 
 			eventDate.set({
 				hour: 8,
@@ -116,9 +120,7 @@ const endAtTimeOptions = [
 				second: 0
 			});
 
-			return moment
-				.utc(eventDate)
-				.format(moment.HTML5_FMT.DATETIME_LOCAL_MS);
+			return moment.utc(eventDate).format(moment.HTML5_FMT.DATETIME_LOCAL_MS);
 		}
 	},
 	{
@@ -129,19 +131,17 @@ const endAtTimeOptions = [
 				return null;
 			}
 
-			const eventDate = moment.utc(event_start, moment.HTML5_FMT.DATETIME_LOCAL_MS).local();
+			const eventDate = moment
+				.utc(event_start, moment.HTML5_FMT.DATETIME_LOCAL_MS)
+				.local();
 
-			eventDate
-				.subtract(1, "d")
-				.set({
-					hour: 8,
-					minute: 0,
-					second: 0
-				});
+			eventDate.subtract(1, "d").set({
+				hour: 8,
+				minute: 0,
+				second: 0
+			});
 
-			return moment
-				.utc(eventDate)
-				.format(moment.HTML5_FMT.DATETIME_LOCAL_MS);
+			return moment.utc(eventDate).format(moment.HTML5_FMT.DATETIME_LOCAL_MS);
 		}
 	},
 	{
@@ -151,10 +151,8 @@ const endAtTimeOptions = [
 			if (!endAt) {
 				return null;
 			}
-			
-			return moment
-				.utc(endAt)
-				.format(moment.HTML5_FMT.DATETIME_LOCAL_MS);
+
+			return moment.utc(endAt).format(moment.HTML5_FMT.DATETIME_LOCAL_MS);
 		}
 	}
 ];
@@ -208,7 +206,7 @@ class HoldDialog extends React.Component {
 			this.setState({
 				hold: createHoldForInput({
 					event_id: eventId,
-					endAt: null//moment().add(1, "year")
+					endAt: null //moment().add(1, "year")
 				})
 			});
 		}
@@ -253,7 +251,9 @@ class HoldDialog extends React.Component {
 
 		//Get the calculated end_date using the event dates
 		const { endAtTimeKey, endAt } = hold;
-		const endAtOption = endAtTimeOptions.find(option => option.value === endAtTimeKey);
+		const endAtOption = endAtTimeOptions.find(
+			option => option.value === endAtTimeKey
+		);
 		Bigneon()
 			.events.read({ id: eventId })
 			.then(response => {
@@ -266,7 +266,9 @@ class HoldDialog extends React.Component {
 					.then(response => {
 						const { id } = response.data;
 						this.setState({ isSubmitting: false });
-						const message = `Successfully ${hold.id ? "updated" : "created"} hold`;
+						const message = `Successfully ${
+							hold.id ? "updated" : "created"
+						} hold`;
 						notification.show({
 							message,
 							variant: "success"
@@ -289,7 +291,6 @@ class HoldDialog extends React.Component {
 					error
 				});
 			});
-
 	}
 
 	renderTicketTypesOrMaxPerUser() {
@@ -355,10 +356,18 @@ class HoldDialog extends React.Component {
 
 	renderQuantities() {
 		const { holdType } = this.props;
-		const { hold, errors, parentHold, totalAvailablePerTicketType } = this.state;
+		const {
+			hold,
+			errors,
+			parentHold,
+			totalAvailablePerTicketType
+		} = this.state;
 
 		const { ticket_type_id } = hold;
-		const totalAvailable = ticket_type_id && totalAvailablePerTicketType[ticket_type_id] ? totalAvailablePerTicketType[ticket_type_id] : null;
+		const totalAvailable =
+			ticket_type_id && totalAvailablePerTicketType[ticket_type_id]
+				? totalAvailablePerTicketType[ticket_type_id]
+				: null;
 
 		if (holdType === HOLD_TYPES.SPLIT) {
 			const totalHeld = parentHold.quantity - hold.quantity;
@@ -402,13 +411,17 @@ class HoldDialog extends React.Component {
 						value={hold.quantity}
 						name="quantity"
 						label="Total Held*"
-						labelProps={totalAvailable ? {
-							superText: `All ${totalAvailable} tickets`,
-							onSuperTextClick: () => {
-								hold.quantity = totalAvailable;
-								this.setState({ hold });
-							}
-						} : null}
+						labelProps={
+							totalAvailable
+								? {
+									superText: `All ${totalAvailable} tickets`,
+									onSuperTextClick: () => {
+										hold.quantity = totalAvailable;
+										this.setState({ hold });
+									}
+								  }
+								: null
+						}
 						placeholder="100"
 						type="number"
 						onChange={e => {
@@ -459,7 +472,7 @@ class HoldDialog extends React.Component {
 		if (!hold.endAtTimeKey || hold.endAtTimeKey !== "custom") {
 			return null;
 		}
-		
+
 		const { endAt } = hold;
 
 		return (
