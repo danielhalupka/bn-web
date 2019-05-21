@@ -88,7 +88,10 @@ class FeeSchedule extends Component {
 				});
 
 				if (id) {
-					this.setState({ id, name, ranges: formattedRanges }, this.addZeroFeeRange.bind(this));
+					this.setState(
+						{ id, name, ranges: formattedRanges },
+						this.addZeroFeeRange.bind(this)
+					);
 				} else {
 					this.addNewRange();
 				}
@@ -139,9 +142,15 @@ class FeeSchedule extends Component {
 		Bigneon()
 			.organizations.read({ id: organizationId })
 			.then(response => {
-				const { event_fee_in_cents } = response.data;
+				const {
+					client_event_fee_in_cents,
+					company_event_fee_in_cents,
+					event_fee_in_cents
+				} = response.data;
 
 				this.setState({
+					company_event_fee_in_cents,
+					client_event_fee_in_cents,
 					event_fee_in_cents
 				});
 			})
@@ -215,13 +224,17 @@ class FeeSchedule extends Component {
 				}
 			}
 
-			const previousMinPrice = ranges[index - 1] ? Number(ranges[index - 1].min_price) : 0;
+			const previousMinPrice = ranges[index - 1]
+				? Number(ranges[index - 1].min_price)
+				: 0;
 			if (index > 0 && min_price <= previousMinPrice) {
 				if (!rangesErrors[index]) {
 					rangesErrors[index] = {};
 				}
 
-				rangesErrors[index].min_price = `Minimum price must be more than $${previousMinPrice}.`;
+				rangesErrors[
+					index
+				].min_price = `Minimum price must be more than $${previousMinPrice}.`;
 			}
 		});
 
@@ -348,10 +361,7 @@ class FeeSchedule extends Component {
 					</Typography>
 				</div>
 				<div style={{ display: "flex", paddingTop: 20 }}>
-					<Button
-						style={{ marginRight: 5, flex: 1 }}
-						onClick={onClose}
-					>
+					<Button style={{ marginRight: 5, flex: 1 }} onClick={onClose}>
 						Cancel
 					</Button>
 					<Button
@@ -418,7 +428,10 @@ class FeeSchedule extends Component {
 									disabled={true}
 									value={
 										ranges.length - 1 >= index + 1
-											? (ranges[index + 1].min_price < 0.01 ? 0 : ranges[index + 1].min_price - 0.01).toFixed(2)
+											? (ranges[index + 1].min_price < 0.01
+												? 0
+												: ranges[index + 1].min_price - 0.01
+											  ).toFixed(2)
 											: "and up"
 									}
 									onChange={() => {}}
@@ -483,7 +496,14 @@ class FeeSchedule extends Component {
 								/>
 							</Grid>
 
-							<Grid item xs={12} sm={2} md={2} lg={2} className={classes.actionButtonContainer}>
+							<Grid
+								item
+								xs={12}
+								sm={2}
+								md={2}
+								lg={2}
+								className={classes.actionButtonContainer}
+							>
 								{index > 0 ? (
 									<IconButton
 										onClick={e => this.deleteRange(index)}
@@ -491,7 +511,9 @@ class FeeSchedule extends Component {
 									>
 										<DeleteIcon/>
 									</IconButton>
-								) : <span/>}
+								) : (
+									<span/>
+								)}
 
 								<IconButton
 									onClick={e => this.addNewRange(index + 1)}
@@ -513,7 +535,12 @@ class FeeSchedule extends Component {
 
 	renderDisplay() {
 		const { classes } = this.props;
-		const { ranges, event_fee_in_cents } = this.state;
+		const {
+			ranges,
+			company_event_fee_in_cents,
+			client_event_fee_in_cents,
+			event_fee_in_cents
+		} = this.state;
 
 		return (
 			<div>
@@ -575,8 +602,8 @@ class FeeSchedule extends Component {
 					<Typography className={classes.tableHeading}>Total</Typography>
 				</FeeRow>
 				<FeeRow shaded>
-					<DollarValue>{event_fee_in_cents}</DollarValue>
-					<DollarValue>{0}</DollarValue>
+					<DollarValue>{company_event_fee_in_cents}</DollarValue>
+					<DollarValue>{client_event_fee_in_cents}</DollarValue>
 					<Typography className={classes.tableHeading}>&nbsp;</Typography>
 					<Typography className={classes.tableHeading}>&nbsp;</Typography>
 					<DollarValue>{event_fee_in_cents}</DollarValue>
@@ -598,7 +625,6 @@ class FeeSchedule extends Component {
 		}
 
 		return this.renderDisplay();
-		
 	}
 }
 
