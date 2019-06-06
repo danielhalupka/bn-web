@@ -13,6 +13,7 @@ import Card from "../../../elements/Card";
 import HorizontalBreakdownBar from "../../../elements/charts/HorizontalBreakdownBar";
 import TicketTypeSalesBarChart from "../../../elements/charts/TicketTypeSalesBarChart";
 import DateFlag from "../../../elements/event/DateFlag";
+import servedImage from "../../../../helpers/imagePathHelper";
 
 const styles = theme => {
 	return {
@@ -291,7 +292,7 @@ const EventSummaryCard = props => {
 								className={classes.expandIconRow}
 								onClick={() => onExpandClick(id)}
 							>
-								<img src={"/icons/down-active.svg"}/>
+								<img src={servedImage("/icons/down-active.svg")}/>
 							</div>
 						) : (
 							<div className={classes.expandIconRowPlaceholder}>&nbsp;</div>
@@ -338,7 +339,7 @@ const EventSummaryCard = props => {
 								className={classes.expandIconRow}
 								onClick={() => onExpandClick(null)}
 							>
-								<img src={"/icons/up-active.svg"}/>
+								<img src={servedImage("/icons/up-active.svg")}/>
 							</div>
 						</div>
 					</Collapse>

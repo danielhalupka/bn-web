@@ -9,6 +9,7 @@ import Hidden from "@material-ui/core/Hidden";
 import { toolBarHeight } from "../../../config/theme";
 import layout from "../../../stores/layout";
 import user from "../../../stores/user";
+import servedImage from "../../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	root: {
@@ -53,7 +54,7 @@ const BoxOfficeLink = observer(({ classes }) => {
 				<img
 					alt="Box office icon"
 					className={classes.icon}
-					src="/icons/tickets-multi.svg"
+					src={servedImage("/icons/tickets-multi.svg")}
 				/>
 
 				<Hidden smDown implementation="css">

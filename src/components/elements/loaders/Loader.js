@@ -5,6 +5,7 @@ import { withStyles } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 
 import { fontFamilyDemiBold } from "../../../config/theme";
+import servedImage from "../../../helpers/imagePathHelper";
 import "./loader.css";
 const loadingImage = require("./loading.svg");
 
@@ -36,8 +37,14 @@ const Loader = props => {
 
 	return (
 		<div className={classes.root} style={style}>
-			<img className={classnames(classes.icon, "loader-image")} alt={children} src={loadingImage}/>
-			{children ? <Typography className={classes.text}>{children}</Typography> : null}
+			<img
+				className={classnames(classes.icon, "loader-image")}
+				alt={children}
+				src={servedImage(loadingImage)}
+			/>
+			{children ? (
+				<Typography className={classes.text}>{children}</Typography>
+			) : null}
 		</div>
 	);
 };

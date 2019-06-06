@@ -197,7 +197,7 @@ class Venue extends Component {
 
 		if (!venueId) {
 			if (!organizationId) {
-				errors.organizationId = "Select and organization.";
+				errors.organizationId = "Select an organization.";
 			}
 		}
 

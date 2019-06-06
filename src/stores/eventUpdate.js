@@ -141,7 +141,7 @@ class EventUpdate {
 			capacity: "",
 			priceAtDoor: "",
 			increment: 1,
-			limitPerPerson: 10,
+			limitPerPerson: undefined,
 			price_in_cents: "",
 			visibility: "Always",
 			//By default the server will create a Default ticket price point, anything additional added to this array is an override.

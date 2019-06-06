@@ -4,6 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { fontFamilyDemiBold, textColorPrimary } from "../../../config/theme";
 import classNames from "classnames";
+import servedImage from "../../../helpers/imagePathHelper";
 
 const styles = theme => {
 	return {
@@ -77,13 +78,22 @@ const CheckBox = ({
 						[classes.disabledActiveSquare]: !!disabled
 					})}
 				>
-					<img className={classes.checkmark} src="/icons/checkmark-white.svg"/>
+					<img
+						className={classes.checkmark}
+						src={servedImage("/icons/checkmark-white.svg")}
+					/>
 				</div>
 			) : (
 				<div className={classes.square}/>
 			)}
 			{children ? (
-				<Typography className={classNames({ [classes.label]: true, [classes.labelActive]: !!active, [labelClass]: !!labelClass })}>
+				<Typography
+					className={classNames({
+						[classes.label]: true,
+						[classes.labelActive]: !!active,
+						[labelClass]: !!labelClass
+					})}
+				>
 					{children}
 				</Typography>
 			) : null}

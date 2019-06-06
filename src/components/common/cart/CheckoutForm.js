@@ -4,15 +4,13 @@ import { withStyles } from "@material-ui/core/styles";
 import PropTypes from "prop-types";
 
 import notification from "../../../stores/notifications";
-import {
-	Grid,
-	Typography
-} from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
 import Button from "../../elements/Button";
 import user from "../../../stores/user";
 import { fontFamilyDemiBold } from "../../../config/theme";
 import Dialog from "../../elements/Dialog";
 import RadioButton from "../../elements/form/RadioButton";
+import servedImage from "../../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	paymentContainer: {
@@ -138,7 +136,11 @@ class CheckoutForm extends Component {
 		const { statusMessage } = this.state;
 
 		return (
-			<Dialog iconUrl={"/icons/credit-card-white.svg"} open={!!statusMessage} title={statusMessage || ""}>
+			<Dialog
+				iconUrl={"/icons/credit-card-white.svg"}
+				open={!!statusMessage}
+				title={statusMessage || ""}
+			>
 				<div/>
 			</Dialog>
 		);
@@ -214,57 +216,66 @@ class CheckoutForm extends Component {
 			<form noValidate autoComplete="off" onSubmit={this.onSubmit.bind(this)}>
 				{this.renderProcessingDialog()}
 				<Grid className={classes.paymentContainer} item xs={12} sm={12} lg={12}>
-					{allowedPaymentMethods ? allowedPaymentMethods.map((method, index) => {
-						const onClick = () =>
-							this.onPaymentMethodChanged(
-								method.method + "|" + method.provider
-							);
-
-						let showSelectOption = true;
-						let showRadio = true;
-						if (allowedPaymentMethods.length === 1 && method) {
-							if (method.method === "Card") {
-								showSelectOption = false;
-							} else if (method.method === "Provider") {
-								showRadio = false;
-							}
-						}
-
-						return (
-							<div key={method.method + "|" + method.provider}>
-								{showSelectOption ? (
-									<div
-										onClick={onClick}
-										className={classes.paymentOptionContainer}
-										style={!showRadio ? { display: "flex", justifyContent: "center" } : {}}
-									>
-										{showRadio ? (
-											<RadioButton
-												active={paymentMethod === method.method + "|" + method.provider}
-												onClick={onClick}
-											/>
-										) : null }
-
-										{iconSrc[method.provider].map(icon => {
-											return (
-												<img
-													width="30"
-													height="30"
-													src={"/icons/" + icon}
-													key={icon}
-													style={{ marginRight: 2 }}
-												/>
-											);
-										})}
-									</div>
-								) : null }
-
-								{this.renderPaymentSpecificDetails(
+					{allowedPaymentMethods
+						? allowedPaymentMethods.map((method, index) => {
+							const onClick = () =>
+								this.onPaymentMethodChanged(
 									method.method + "|" + method.provider
-								)}
-							</div>
-						);
-					}) : null}
+								);
+
+							let showSelectOption = true;
+							let showRadio = true;
+							if (allowedPaymentMethods.length === 1 && method) {
+								if (method.method === "Card") {
+									showSelectOption = false;
+								} else if (method.method === "Provider") {
+									showRadio = false;
+								}
+							}
+
+							return (
+								<div key={method.method + "|" + method.provider}>
+									{showSelectOption ? (
+										<div
+											onClick={onClick}
+											className={classes.paymentOptionContainer}
+											style={
+												!showRadio
+													? { display: "flex", justifyContent: "center" }
+													: {}
+											}
+										>
+											{showRadio ? (
+												<RadioButton
+													active={
+														paymentMethod ===
+															method.method + "|" + method.provider
+													}
+													onClick={onClick}
+												/>
+											) : null}
+
+											{iconSrc[method.provider].map(icon => {
+												return (
+													<img
+														width="30"
+														height="30"
+														src={servedImage("/icons/" + icon)}
+														key={icon}
+														style={{ marginRight: 2 }}
+													/>
+												);
+											})}
+										</div>
+									) : null}
+
+									{this.renderPaymentSpecificDetails(
+										method.method + "|" + method.provider
+									)}
+								</div>
+							);
+						  })
+						: null}
 				</Grid>
 
 				<Grid item xs={12} sm={12} lg={12}>

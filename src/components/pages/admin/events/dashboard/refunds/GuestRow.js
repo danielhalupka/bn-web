@@ -9,6 +9,7 @@ import {
 } from "../../../../../../config/theme";
 import GuestTicketRow from "./GuestTicketRow";
 import CheckBox from "../../../../../elements/form/CheckBox";
+import servedImage from "../../../../../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	root: {
@@ -107,9 +108,9 @@ const GuestRow = props => {
 							<img
 								alt="Expand icon"
 								className={classes.expandIcon}
-								src={
+								src={servedImage(
 									expanded ? "/icons/up-active.svg" : "/icons/down-active.svg"
-								}
+								)}
 							/>
 						</div>
 					</div>

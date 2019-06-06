@@ -9,6 +9,7 @@ import changeUrlParam from "../../../../helpers/changeUrlParam";
 import PropTypes from "prop-types";
 import Button from "../../../elements/Button";
 import getUrlParam from "../../../../helpers/getUrlParam";
+import servedImage from "../../../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	root: {
@@ -172,7 +173,7 @@ class ReportsDate extends Component {
 					<Grid item className={classes.titleContainer} {...columnSizes[0]}>
 						<img
 							alt={"Report date"}
-							src="/icons/events-active.svg"
+							src={servedImage("/icons/events-active.svg")}
 							className={classes.icon}
 						/>
 						<Typography className={classes.title}>Set report date</Typography>

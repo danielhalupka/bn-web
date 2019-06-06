@@ -10,6 +10,7 @@ import Hidden from "@material-ui/core/Hidden";
 import user from "../../../stores/user";
 import { primaryHex } from "../../../config/theme";
 import { toolBarHeight } from "../../../config/theme";
+import servedImage from "../../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	root: {
@@ -133,7 +134,7 @@ class CurrentOrganizationMenu extends React.Component {
 					<img
 						alt="Organization icon"
 						className={classes.dropdownIcon}
-						src="/icons/down-active.svg"
+						src={servedImage("/icons/down-active.svg")}
 					/>
 				</span>
 				{this.renderOrgMenu()}

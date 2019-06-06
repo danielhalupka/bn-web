@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
+import servedImage from "../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	root: {
@@ -32,7 +33,11 @@ const VisitEventPage = props => {
 		<div style={style} className={classes.root}>
 			<a href={`/events/${id}`} target={"_blank"} className={classes.link}>
 				<Typography className={classes.text}>{label}</Typography>
-				<img alt={label} src="/icons/right-active.svg" className={classes.icon}/>
+				<img
+					alt={label}
+					src={servedImage("/icons/right-active.svg")}
+					className={classes.icon}
+				/>
 			</a>
 		</div>
 	);

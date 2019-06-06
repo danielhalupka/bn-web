@@ -327,7 +327,7 @@ class CheckoutConfirmation extends Component {
 
 		const { cartSummary, formattedExpiryTime, cartExpired } = cart;
 
-		const { event, artists, id } = selectedEvent;
+		const { event, artists, id, venue } = selectedEvent;
 
 		if (event === null) {
 			return (
@@ -405,7 +405,7 @@ class CheckoutConfirmation extends Component {
 
 		return (
 			<div className={classes.root}>
-				<Meta type={"checkout"} {...event}/>
+				<Meta {...event} venue={venue} artists={artists} type={"checkout"}/>
 
 				{/*DESKTOP*/}
 				<Hidden smDown>

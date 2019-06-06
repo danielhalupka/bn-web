@@ -8,7 +8,7 @@ import Card from "../Card";
 import { fontFamilyDemiBold, secondaryHex } from "../../../config/theme";
 import MaintainAspectRatio from "../MaintainAspectRatio";
 import optimizedImageUrl from "../../../helpers/optimizedImageUrl";
-import settings from "../../../config/settings";
+import Settings from "../../../config/settings";
 
 const styles = theme => ({
 	card: {
@@ -103,20 +103,26 @@ const EventResultCard = ({
 }) => {
 	const style = {};
 	if (promo_image_url) {
-		style.backgroundImage = `linear-gradient(to top, #000000, rgba(0, 0, 0, 0)), url(${optimizedImageUrl(promo_image_url, "low", { w: 430 })})`;
+		style.backgroundImage = `linear-gradient(to top, #000000, rgba(0, 0, 0, 0)), url(${optimizedImageUrl(
+			promo_image_url,
+			"low",
+			{ w: 430 }
+		)})`;
 	}
 	venueTimezone = venueTimezone || "America/Los_Angeles";
 	const eventStartDateMoment = moment.utc(event_start);
 
-	const displayEventStartDate = eventStartDateMoment.tz(venueTimezone).format(
-		"ddd, MMM Do"
-	);
-	const displayShowTime = moment(eventStartDateMoment).tz(venueTimezone).format("h:mm A");
+	const displayEventStartDate = eventStartDateMoment
+		.tz(venueTimezone)
+		.format("ddd, MMM Do");
+	const displayShowTime = moment(eventStartDateMoment)
+		.tz(venueTimezone)
+		.format("h:mm A");
 
 	return (
 		<Link to={`/events/${id}`}>
 			<Card borderLess variant="default">
-				<MaintainAspectRatio aspectRatio={settings().promoImageAspectRatio}>
+				<MaintainAspectRatio aspectRatio={Settings().promoImageAspectRatio}>
 					<div className={classes.media} style={style}>
 						<PriceTag
 							min={min_ticket_price}
@@ -135,9 +141,7 @@ const EventResultCard = ({
 					</div>
 					<div className={classes.singleDetail} style={{ textAlign: "right" }}>
 						<Typography className={classes.label}>Showtime</Typography>
-						<Typography className={classes.value}>
-							{displayShowTime}
-						</Typography>
+						<Typography className={classes.value}>{displayShowTime}</Typography>
 					</div>
 				</div>
 			</Card>

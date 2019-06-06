@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { observer } from "mobx-react";
 import { withStyles } from "@material-ui/core/styles";
 import layout from "../../../stores/layout";
+import servedImage from "../../../helpers/imagePathHelper";
 
 const styles = () => {
 	return {
@@ -19,7 +20,11 @@ const AppBarLogo = observer(({ classes }) => {
 		<img
 			alt="Header logo"
 			className={classes.headerImage}
-			src={showStudioLogo ? "/images/bn-logo-text.svg" : "/images/bn-logo-text-web.svg"}
+			src={
+				showStudioLogo
+					? servedImage("/images/bn-logo-text.svg")
+					: servedImage("/images/bn-logo-text-web.svg")
+			}
 		/>
 	);
 });

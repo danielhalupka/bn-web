@@ -9,6 +9,7 @@ import LeftAlignedSubCard from "../../../../elements/LeftAlignedSubCard";
 import TicketType from "./TicketType";
 import eventUpdateStore from "../../../../../stores/eventUpdate";
 import Button from "../../../../elements/Button";
+import servedImage from "../../../../../helpers/imagePathHelper";
 import { DEFAULT_END_TIME_HOURS_AFTER_SHOW_TIME } from "./Details";
 
 const formatForSaving = (ticketTypes, event) => {
@@ -22,6 +23,7 @@ const formatForSaving = (ticketTypes, event) => {
 			name,
 			pricing,
 			startTime,
+			saleStartTimeOption,
 			saleEndTimeOption,
 			endTime,
 			limitPerPerson,
@@ -31,18 +33,26 @@ const formatForSaving = (ticketTypes, event) => {
 			parentId
 		} = ticketType;
 
-		let { startDate, endDate } = ticketType;
-
-		startDate = moment(startDate);
-		if (startTime) {
-			startDate = startDate.set({
-				hour: startTime.get("hour"),
-				minute: startTime.get("minute"),
-				second: startTime.get("second")
-			});
-		}
-
+		let { startDate: ticketTypeStartDate, endDate } = ticketType;
 		const { doorTime, eventDate } = event;
+
+		//Override whatever we have with now if it needs to go on sale immediately
+		let useOldestPricePointAsStartDate = false;
+		if (saleStartTimeOption === "immediately") {
+			ticketTypeStartDate = moment();
+
+			//Or set it to the oldest pricing start time to pass server side validation
+			useOldestPricePointAsStartDate = true; //Used when processing pricing
+		} else {
+			ticketTypeStartDate = moment(ticketTypeStartDate);
+			if (startTime) {
+				ticketTypeStartDate = ticketTypeStartDate.set({
+					hour: startTime.get("hour"),
+					minute: startTime.get("minute"),
+					second: startTime.get("second")
+				});
+			}
+		}
 
 		switch (saleEndTimeOption) {
 			case "door":
@@ -89,6 +99,15 @@ const formatForSaving = (ticketTypes, event) => {
 					});
 				}
 
+				//If a user selects a ticket type to go on sale immediately but there are price points set in the past
+				//just force the start date for the ticket type to be the oldest price point
+				if (
+					useOldestPricePointAsStartDate &&
+					ticketTypeStartDate.isAfter(startDate)
+				) {
+					ticketTypeStartDate = startDate;
+				}
+
 				endDate = moment(endDate);
 				if (endTime) {
 					endDate = endDate.set({
@@ -119,10 +138,12 @@ const formatForSaving = (ticketTypes, event) => {
 				// Using != instead of !== here to check for null or undefined
 				parentId != null
 					? null
-					: startDate.utc().format(moment.HTML5_FMT.DATETIME_LOCAL_MS),
+					: ticketTypeStartDate
+						.utc()
+						.format(moment.HTML5_FMT.DATETIME_LOCAL_MS),
 			end_date: endDate.utc().format(moment.HTML5_FMT.DATETIME_LOCAL_MS),
 			limit_per_person:
-				limitPerPerson === "" ? undefined : Number(limitPerPerson),
+				!limitPerPerson || isNaN(limitPerPerson) ? 0 : Number(limitPerPerson),
 			price_in_cents: Number(priceForDisplay) * 100,
 			ticket_pricing,
 			visibility: visibility,
@@ -204,14 +225,19 @@ const formatForInput = (ticket_types, event) => {
 			saleEndTimeOption = "custom";
 		}
 
+		let saleStartTimeOption = parent_id ? "parent" : "custom";
+		if (ticketStartDate && ticketStartDate.isBefore(moment.utc().local())) {
+			saleStartTimeOption = "immediately";
+		}
+
 		const ticketType = {
 			id,
 			name,
 			description: description || "",
 			capacity: capacity ? capacity : 0,
 			increment: increment ? increment : 1,
-			limitPerPerson: limit_per_person ? limit_per_person : "",
-			saleStartTimeOption: parent_id ? "parent" : "custom",
+			limitPerPerson: limit_per_person ? limit_per_person : undefined,
+			saleStartTimeOption,
 			startDate: ticketStartDate ? ticketStartDate.clone() : null,
 			startTime: ticketStartDate,
 			saleEndTimeOption,
@@ -223,7 +249,10 @@ const formatForInput = (ticket_types, event) => {
 			priceForDisplay: price_in_cents / 100,
 			status,
 			visibility,
-			parentId: parent_id
+			parentId: parent_id,
+			showMaxTicketsPerCustomer: !!limit_per_person,
+			showVisibility: !visibility && visibility !== "Always",
+			showCartQuantityIncrement: !!increment && increment !== 1
 		};
 
 		ticketTypes.push(ticketType);
@@ -340,11 +369,13 @@ const validateFields = ticketTypes => {
 			if (!startDate) {
 				ticketErrors.startDate = "Specify the ticket start time.";
 			}
-		} else {
+		} else if (saleStartTimeOption === "parent") {
 			// Using == instead of === here to check for null or undefined
-			if (saleStartTimeOption === "parent" && parentId == null) {
+			if (parentId == null) {
 				ticketErrors.parentId = "Specify the ticket to start after.";
 			}
+		} else if (saleStartTimeOption === "immediately") {
+			//Nothing to validate here
 		}
 
 		if (saleEndTimeOption === "custom") {
@@ -618,7 +649,10 @@ class EventTickets extends Component {
 					className={classes.addTicketType}
 					onClick={() => eventUpdateStore.addTicketType()}
 				>
-					<img className={classes.addIcon} src="/icons/add-ticket.svg"/>
+					<img
+						className={classes.addIcon}
+						src={servedImage("/icons/add-ticket.svg")}
+					/>
 					<Typography className={classes.addText} variant="body2">
 						Add another ticket type
 					</Typography>

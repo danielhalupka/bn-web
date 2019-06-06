@@ -18,6 +18,7 @@ import ColorTag from "../../../../../elements/ColorTag";
 
 import CustomTooltip from "../../../../../elements/Tooltip";
 import Divider from "../../../../../common/Divider";
+import servedImage from "../../../../../../helpers/imagePathHelper";
 
 const styles = theme => {
 	return {
@@ -204,7 +205,9 @@ const DesktopActionButtons = ({ actions, classes }) => {
 						<span key={label} onClick={onClick}>
 							<img
 								alt={label}
-								src={`/icons/${iconName}-${clicked ? "active" : "gray"}.svg`}
+								src={servedImage(
+									`/icons/${iconName}-${clicked ? "active" : "gray"}.svg`
+								)}
 								className={classes.desktopIcon}
 							/>
 						</span>
@@ -242,7 +245,7 @@ const MobileActionButtons = ({ actions, classes }) => {
 						>
 							<img
 								alt={label}
-								src={`/icons/${iconName}-active.svg`}
+								src={servedImage(`/icons/${iconName}-active.svg`)}
 								className={classes.mobileIcon}
 							/>
 							<Typography className={classes.mobileActionLabel}>

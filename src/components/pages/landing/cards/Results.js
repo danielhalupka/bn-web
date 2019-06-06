@@ -7,6 +7,7 @@ import ResultsRegionFilter from "./ResultsRegionFilter";
 import eventResults from "../../../../stores/eventResults";
 import EventResultCard from "../../../elements/event/EventResultCard";
 import Button from "../../../elements/Button";
+import servedImage from "../../../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	root: {
@@ -38,7 +39,7 @@ const NoResults = ({ classes, onClear }) => (
 		<img
 			className={classes.noResultsImage}
 			alt="No results found"
-			src="/icons/events-gray.svg"
+			src={servedImage("/icons/events-gray.svg")}
 		/>
 		<Typography className={classes.noResultText}>No results found.</Typography>
 		<Button variant="callToAction" onClick={onClear}>

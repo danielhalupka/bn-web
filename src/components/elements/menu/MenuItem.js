@@ -9,6 +9,7 @@ import Typography from "@material-ui/core/Typography";
 import ExpandLess from "@material-ui/icons/ExpandLess";
 import ExpandMore from "@material-ui/icons/ExpandMore";
 import classnames from "classnames";
+import servedImage from "../../../helpers/imagePathHelper";
 
 const styles = theme => {
 	return {
@@ -72,7 +73,11 @@ const MenuItem = props => {
 					[classes.listItem]: !active
 				})}
 			>
-				<img alt={children} src={iconUrl} className={classes.icon}/>
+				<img
+					alt={children}
+					src={servedImage(iconUrl)}
+					className={classes.icon}
+				/>
 
 				<Typography
 					className={classes.textSmall}
@@ -90,7 +95,11 @@ const MenuItem = props => {
 				className={active ? classes.activeListItem : classes.listItem}
 			>
 				<ListItemIcon className={classes.iconContainer}>
-					<img alt={children} src={iconUrl} className={classes.icon}/>
+					<img
+						alt={children}
+						src={servedImage(iconUrl)}
+						className={classes.icon}
+					/>
 				</ListItemIcon>
 
 				<ListItemText
@@ -102,7 +111,8 @@ const MenuItem = props => {
 							color={active ? "secondary" : "textSecondary"}
 						>
 							{children}
-						</Typography>)}
+						</Typography>
+					)}
 				/>
 				{expandIcon}
 			</ListItem>

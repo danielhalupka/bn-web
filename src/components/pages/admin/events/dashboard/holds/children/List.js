@@ -1,18 +1,25 @@
 import React, { Component } from "react";
-import { Typography, withStyles, CardMedia } from "@material-ui/core";
+import { Typography, withStyles, CardMedia, Hidden } from "@material-ui/core";
 
 import notifications from "../../../../../../../stores/notifications";
 import Button from "../../../../../../elements/Button";
 import Bigneon from "../../../../../../../helpers/bigneon";
 import Divider from "../../../../../../common/Divider";
 import HoldRow from "./ChildRow";
-import ChildDialog from "./ChildDialog";
+import ChildDialog, { HOLD_TYPES } from "./ChildDialog";
 import Container from "../../Container";
 import Loader from "../../../../../../elements/loaders/Loader";
 import user from "../../../../../../../stores/user";
+import Dialog from "../../../../../../elements/Dialog";
+import copyToClipboard from "../../../../../../../helpers/copyToClipboard";
 
 const styles = theme => ({
-	root: {}
+	root: {},
+	desktopHeadingRow: {
+		display: "flex",
+		paddingLeft: theme.spacing.unit * 2,
+		paddingRight: theme.spacing.unit * 2
+	}
 });
 
 class ChildrenList extends Component {
@@ -20,14 +27,22 @@ class ChildrenList extends Component {
 		super(props);
 
 		this.eventId = this.props.match.params.id;
-		this.holdId = this.props.match.params.holdId;
+		this.parentHoldId = this.props.match.params.holdId;
 
 		this.state = {
 			activeHoldId: null, //TODO check this is not used and remove if not
 			showDialog: null,
 			ticketTypes: [],
 			children: [],
-			holdDetails: {}
+			holdDetails: {},
+			holdType: HOLD_TYPES.NEW,
+			showHoldDialog: null,
+			deleteId: null,
+			expandRowId: null,
+			codes: [],
+			linkCopiedId: null,
+			linkIsCopied: false,
+			holdId: this.props.match.params.holdId
 		};
 	}
 
@@ -35,7 +50,7 @@ class ChildrenList extends Component {
 		this.loadEventDetails();
 
 		Bigneon()
-			.holds.read({ id: this.holdId })
+			.holds.read({ id: this.state.holdId })
 			.then(response => {
 				const holdDetails = response.data;
 				this.setState({ holdDetails }, () => this.refreshChildren());
@@ -69,9 +84,9 @@ class ChildrenList extends Component {
 	}
 
 	refreshChildren() {
-		if (this.eventId && this.holdId) {
+		if (this.eventId && this.state.holdId) {
 			Bigneon()
-				.holds.children.index({ hold_id: this.holdId })
+				.holds.children.index({ hold_id: this.parentHoldId })
 				.then(response => {
 					//TODO Pagination
 					this.setState({ children: response.data.data });
@@ -85,15 +100,183 @@ class ChildrenList extends Component {
 		}
 	}
 
+	deleteChild(id) {
+		Bigneon()
+			.holds.delete({ id })
+			.then(response => {
+				this.refreshChildren();
+				notifications.show({ message: "Hold deleted.", variant: "success" });
+			})
+			.catch(error => {
+				console.error(error);
+				this.setState({ isSubmitting: false });
+
+				notifications.showFromErrorResponse({
+					error,
+					defaultMessage: "Failed to delete hold."
+				});
+			});
+	}
+
 	onAddHold() {
 		this.setState({
+			holdType: HOLD_TYPES.NEW,
 			activeHoldId: null,
 			showDialog: true
 		});
 	}
 
+	renderDeleteDialog() {
+		const { deleteId } = this.state;
+
+		const onClose = () => this.setState({ deleteId: null });
+
+		return (
+			<Dialog title={"Delete hold?"} open={!!deleteId} onClose={onClose}>
+				<div>
+					<Typography>Are you sure you want to delete this hold?</Typography>
+
+					<br/>
+					<br/>
+					<div style={{ display: "flex" }}>
+						<Button style={{ flex: 1, marginRight: 5 }} onClick={onClose}>
+							Cancel
+						</Button>
+						<Button
+							style={{ flex: 1, marginLeft: 5 }}
+							onClick={() => {
+								this.deleteChild(deleteId);
+								onClose();
+							}}
+						>
+							Delete
+						</Button>
+					</div>
+				</div>
+			</Dialog>
+		);
+	}
+
+	renderShareableLink() {
+		const { showShareableLinkId } = this.state;
+		const { classes } = this.props;
+
+		const onClose = () => this.setState({ showShareableLinkId: null });
+
+		const { children } = this.state;
+
+		let url = null;
+		if (showShareableLinkId) {
+			const hold = children.find(c => c.id === showShareableLinkId);
+			const { redemption_code, event_id } = hold;
+
+			url = `${window.location.protocol}//${
+				window.location.host
+			}/events/${event_id}/tickets?code=${redemption_code}`;
+		}
+
+		return (
+			<Dialog
+				iconUrl={"/icons/link-white.svg"}
+				title={"Shareable link"}
+				open={!!showShareableLinkId}
+				onClose={onClose}
+			>
+				<div>
+					<div className={classes.shareableLinkContainer}>
+						<a
+							href={url}
+							target={"_blank"}
+							className={classes.shareableLinkText}
+						>
+							{url}
+						</a>
+					</div>
+					<div style={{ display: "flex" }}>
+						<Button style={{ flex: 1 }} onClick={onClose}>
+							Done
+						</Button>
+					</div>
+				</div>
+			</Dialog>
+		);
+	}
+
+	copyToClipboard(id) {
+		const { linkCopiedId, children } = this.state;
+
+		const autoClose = () =>
+			setTimeout(() => {
+				const { linkCopiedId } = this.state;
+				if (id === linkCopiedId) {
+					this.setState({ linkCopiedId: null });
+				}
+			}, 2000);
+
+		let url = null;
+		if (id) {
+			const hold = children.find(c => c.id === id);
+			const { redemption_code, event_id } = hold;
+
+			url = `${window.location.protocol}//${
+				window.location.host
+			}/events/${event_id}/tickets?code=${redemption_code}`;
+		}
+
+		if (url) {
+			copyToClipboard(url);
+			this.setState({ linkCopiedId: id }, () => {
+				this.setState({ linkIsCopied: true });
+				autoClose();
+			});
+		}
+	}
+
+	renderDesktopHeadings() {
+		const { classes } = this.props;
+		const headings = [
+			"Name",
+			"Code",
+			"Status",
+			"Total Held",
+			"Claimed",
+			"Remaining",
+			"Action"
+		];
+
+		const columnStyles = [
+			{ flex: 3, textAlign: "left" },
+			{ flex: 2, textAlign: "left" },
+			{ flex: 3, textAlign: "center" },
+			{ flex: 2, textAlign: "center" },
+			{ flex: 2, textAlign: "center" },
+			{ flex: 2, textAlign: "left" },
+			{ flex: 2, textAlign: "right" }
+		];
+
+		return (
+			<div className={classes.desktopHeadingRow}>
+				{headings.map((heading, index) => (
+					<Typography
+						key={index}
+						className={classes.desktopHeadingText}
+						style={columnStyles[index]}
+					>
+						{heading}
+					</Typography>
+				))}
+			</div>
+		);
+	}
+
 	renderList() {
-		const { children, hoverId } = this.state;
+		const {
+			children,
+			hoverId,
+			expandRowId,
+			linkCopiedId,
+			linkIsCopied
+		} = this.state;
 		const { classes } = this.props;
 
 		if (children === null) {
@@ -112,17 +295,25 @@ class ChildrenList extends Component {
 			];
 
 			const onAction = (id, action) => {
-				// if (action === "Edit") {
-				// 	this.setState({ activeHoldId: id, showDialog: true, holdType: HOLD_TYPES.EDIT })
-				// }
-				// if (action === "Split") {
-				// 	this.setState({ activeHoldId: id, showDialog: true, holdType: HOLD_TYPES.SPLIT });
-				// }
+				if (action === "Edit") {
+					return this.setState({
+						holdId: id,
+						showDialog: true,
+						holdType: HOLD_TYPES.EDIT
+					});
+				}
+				if (action === "Delete") {
+					return this.setState({ deleteId: id });
+				}
+
+				if (action === "Link") {
+					return this.copyToClipboard(id);
+				}
 			};
 
 			return (
 				<div>
-					<HoldRow heading>{ths}</HoldRow>
+					<Hidden smDown>{this.renderDesktopHeadings()}</Hidden>
 					{children.map((ticket, index) => {
 						const { id, name, redemption_code, quantity, available } = ticket;
 
@@ -151,22 +342,27 @@ class ChildrenList extends Component {
 									{
 										id: id,
 										name: "Link",
-										iconUrl: `/icons/link-${iconColor}.svg`,
+										iconName: "link",
+										tooltipText: linkCopiedId === id ? "Link Copied!" : null,
 										onClick: onAction.bind(this)
 									},
 									{
 										id: id,
 										name: "Edit",
-										iconUrl: `/icons/edit-${iconColor}.svg`,
+										iconName: "edit",
 										onClick: onAction.bind(this)
 									},
 									{
 										id: id,
 										name: "Delete",
-										iconUrl: `/icons/delete-${iconColor}.svg`,
+										iconName: "delete",
 										onClick: onAction.bind(this)
 									}
 								]}
+								expanded={expandRowId === id}
+								onExpand={() =>
+									this.setState({ expandRowId: expandRowId === id ? null : id })
+								}
 							>
 								{tds}
 							</HoldRow>
@@ -180,16 +376,17 @@ class ChildrenList extends Component {
 	}
 
 	renderDialog() {
-		const { ticketTypes, activeHoldId } = this.state;
+		const { ticketTypes, activeHoldId, holdType, holdId } = this.state;
 		const eventId = this.eventId;
-		const holdId = this.holdId;
+		const parentHoldId = this.parentHoldId;
 		return (
 			<ChildDialog
+				holdType={holdType}
 				open={true}
 				eventId={eventId}
 				holdId={holdId}
 				ticketTypes={ticketTypes}
-				onSuccess={id => {
+				onSuccess={parentHoldId => {
 					this.refreshChildren();
 					this.setState({ showDialog: null });
 				}}
@@ -209,6 +406,8 @@ class ChildrenList extends Component {
 				layout={"childrenInsideCard"}
 			>
 				{showDialog && this.renderDialog()}
+				{this.renderDeleteDialog()}
+				{this.renderShareableLink()}
 
 				<div style={{ display: "flex" }}>
 					<Typography variant="title">{holdDetails.name}</Typography>

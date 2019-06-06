@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import { Typography } from "@material-ui/core";
 import { fontFamilyDemiBold } from "../../../../config/theme";
+import servedImage from "../../../../helpers/imagePathHelper";
 
 const styles = theme => {
 	return {
@@ -25,7 +26,7 @@ const BlankSlate = props => {
 		<div className={classes.root}>
 			<img
 				className={classes.icon}
-				src="/icons/tickets-multi.svg"
+				src={servedImage("/icons/tickets-multi.svg")}
 				alt="box-office"
 			/>
 			<Typography className={classes.text}>{children}</Typography>

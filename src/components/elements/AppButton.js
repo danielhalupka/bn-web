@@ -4,7 +4,12 @@ import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import classNames from "classnames";
-import { callToActionBackground, fontFamilyBold, fontFamilyDemiBold } from "../../config/theme";
+import {
+	callToActionBackground,
+	fontFamilyBold,
+	fontFamilyDemiBold
+} from "../../config/theme";
+import servedImage from "../../helpers/imagePathHelper";
 
 const styles = theme => {
 	return {
@@ -82,7 +87,8 @@ const styles = theme => {
 const AppButton = props => {
 	const { classes, children, variant, color, ...rest } = props;
 
-	const iconColor = color === "blackBackground" || color === "callToAction" ? "white" : color;
+	const iconColor =
+		color === "blackBackground" || color === "callToAction" ? "white" : color;
 
 	const iconUrl = variant ? `/icons/${variant}-${iconColor}.svg` : null;
 
@@ -94,7 +100,11 @@ const AppButton = props => {
 	return (
 		<Button
 			classes={{
-				root: classNames({ [classes.button]: true, [classes[color]]: true, [classes.buttonContents]: true }),
+				root: classNames({
+					[classes.button]: true,
+					[classes[color]]: true,
+					[classes.buttonContents]: true
+				}),
 				label: classes[`${color}Label`]
 			}}
 			target="_blank"
@@ -102,9 +112,9 @@ const AppButton = props => {
 		>
 			{iconUrl ? (
 				<div className={classes.iconContainer}>
-					<img className={classes.leftIcon} src={iconUrl}/>
+					<img className={classes.leftIcon} src={servedImage(iconUrl)}/>
 				</div>
-			) : null }
+			) : null}
 			<div className={classes.labelContainer} style={labelStyle}>
 				{children}
 			</div>

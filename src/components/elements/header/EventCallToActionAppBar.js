@@ -15,7 +15,7 @@ import {
 import AppBarLogo from "./AppBarLogo";
 import Button from "../Button";
 import { Slide, Typography } from "@material-ui/core";
-import settings from "../../../config/settings";
+import Settings from "../../../config/settings";
 import user from "../../../stores/user";
 
 const eventImageHeight = 45;
@@ -66,7 +66,7 @@ const styles = theme => {
 		},
 		mobileHeaderImage: {
 			height: eventImageHeight,
-			width: eventImageHeight * settings().promoImageAspectRatio,
+			width: eventImageHeight * Settings().promoImageAspectRatio,
 			backgroundImage: "linear-gradient(255deg, #e53d96, #5491cc)",
 			backgroundRepeat: "no-repeat",
 			backgroundSize: "cover",

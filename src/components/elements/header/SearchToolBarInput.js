@@ -4,6 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 import eventResults from "../../../stores/eventResults";
 import changeUrlParam from "../../../helpers/changeUrlParam";
 import notifications from "../../../stores/notifications";
+import servedImage from "../../../helpers/imagePathHelper";
 
 const styles = {
 	root: {
@@ -82,7 +83,7 @@ class SearchToolBarInput extends Component {
 				<img
 					alt="Search icon"
 					className={classes.icon}
-					src="/icons/search-gray.svg"
+					src={servedImage("/icons/search-gray.svg")}
 				/>
 				<input
 					ref={input => {

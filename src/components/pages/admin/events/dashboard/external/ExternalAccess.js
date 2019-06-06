@@ -14,6 +14,7 @@ import Grid from "@material-ui/core/Grid/Grid";
 import user from "../../../../../../stores/user";
 import IconButton from "../../../../../elements/IconButton";
 import SelectGroup from "../../../../../common/form/SelectGroup";
+import servedImage from "../../../../../../helpers/imagePathHelper";
 
 //Multi Select
 import Select from "@material-ui/core/Select";
@@ -533,7 +534,9 @@ class ExternalAccess extends Component {
 										<div className={classes.missingProfileImageBackground}>
 											<img
 												className={classes.missingProfileImage}
-												src={"/images/profile-pic-placeholder-white.png"}
+												src={servedImage(
+													"/images/profile-pic-placeholder-white.png"
+												)}
 												alt={`${first_name} ${last_name}`}
 											/>
 										</div>

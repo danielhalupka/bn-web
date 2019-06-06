@@ -4,6 +4,7 @@ import classnames from "classnames";
 import { withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { fontFamilyDemiBold, secondaryHex } from "../../config/theme";
+import servedImage from "../../helpers/imagePathHelper";
 
 const styles = theme => {
 	return {
@@ -70,14 +71,18 @@ const PageHeading = props => {
 			}
 		});
 	}
-	
+
 	const headingIsLong = totalChars > 30; //Adjust this if needed
 
 	return (
 		<div style={style} className={classes.root}>
 			<div className={classes.mainContent}>
 				{iconUrl ? (
-					<img alt={children} src={iconUrl} className={classes.icon}/>
+					<img
+						alt={children}
+						src={servedImage(iconUrl)}
+						className={classes.icon}
+					/>
 				) : null}
 				<Typography
 					className={classnames({

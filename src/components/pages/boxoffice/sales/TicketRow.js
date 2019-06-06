@@ -5,6 +5,7 @@ import { withStyles, Typography, Hidden } from "@material-ui/core";
 import Card from "../../../elements/Card";
 import NumberSelect from "../../../elements/form/NumberSelect";
 import { fontFamilyDemiBold } from "../../../../config/theme";
+import servedImage from "../../../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	root: {
@@ -138,7 +139,7 @@ const TicketRow = props => {
 							<div className={classes.mobileIconContainer}>
 								<img
 									alt={"Ticket"}
-									src={iconUrl}
+									src={servedImage(iconUrl)}
 									className={classes.icon}
 									style={columnStyles[0]}
 								/>
@@ -183,13 +184,12 @@ const TicketRow = props => {
 						{iconUrl ? (
 							<img
 								alt={"Ticket"}
-								src={iconUrl}
+								src={servedImage(iconUrl)}
 								className={classes.icon}
 							/>
 						) : null}
 						<div className={classes.mobileInner}>
 							<div className={classes.mobileRow1}>
-
 								<div>
 									<Typography className={classes.name}>{name}</Typography>
 									<Typography className={classes.remaining}>

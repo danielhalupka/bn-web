@@ -49,12 +49,12 @@ class Tickets {
 					const event = ticketGroup[0];
 					const tickets = ticketGroup[1];
 
-					event.eventDate = moment(
-						event.event_start,
-						moment.HTML5_FMT.DATETIME_LOCAL_MS
-					).tz(event.venue.timezone || moment.tz.guess());
+					const venueTimezone = event.venue.timezone || "America/Los_Angeles";
 
-					event.formattedDate = event.eventDate.format("ddd MM/DD/YY, h:mm A");
+					event.eventDate = moment.utc(event.event_start);
+					const displayShowTime = moment(event.eventDate).tz(venueTimezone);
+
+					event.formattedDate = displayShowTime.format("ddd MM/DD/YY, h:mm A");
 
 					ticketGroups.push({ event, tickets });
 				});

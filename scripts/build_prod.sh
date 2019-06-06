@@ -14,3 +14,7 @@ fi
 npm install --production
 npm install --only=dev
 npm run build
+if test ! -z "$BUILD_OUTPUT"
+then
+	mv build "$BUILD_OUTPUT"
+fi

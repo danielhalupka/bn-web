@@ -15,6 +15,7 @@ import Button from "../../../elements/Button";
 import downloadCSV from "../../../../helpers/downloadCSV";
 import { Pagination, urlPageParam } from "../../../elements/pagination";
 import Loader from "../../../elements/loaders/Loader";
+import servedImage from "../../../../helpers/imagePathHelper";
 
 const imageSize = 40;
 
@@ -250,7 +251,9 @@ class FanList extends Component {
 											<div className={classes.missingProfileImageBackground}>
 												<img
 													className={classes.missingProfileImage}
-													src={"/images/profile-pic-placeholder-white.png"}
+													src={servedImage(
+														"/images/profile-pic-placeholder-white.png"
+													)}
 													alt={`${first_name} ${last_name}`}
 												/>
 											</div>

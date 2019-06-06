@@ -3,15 +3,22 @@ import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import { Typography } from "@material-ui/core";
 
-import { callToActionBackground, fontFamilyDemiBold } from "../../../config/theme";
+import {
+	callToActionBackground,
+	fontFamilyDemiBold
+} from "../../../config/theme";
 import AppButton from "../AppButton";
+import servedImage from "../../../helpers/imagePathHelper";
 
 //TODO change external links
 const rootUrl = "";
 const links = [
 	//{ label: "About Us", href: `${rootUrl}/about` },
 	{ label: "About Us", href: `${rootUrl}/venues-and-promoters.html` },
-	{ label: "Sell Tickets", href: `${rootUrl}/venues-and-promoters.html#contact-chat` }
+	{
+		label: "Sell Tickets",
+		href: `${rootUrl}/venues-and-promoters.html#contact-chat`
+	}
 	//{ label: "News", href: `${rootUrl}/blog` },
 	//{ label: "FAQ", href: `${rootUrl}/faq` }
 ];
@@ -19,7 +26,8 @@ const links = [
 const { REACT_APP_SUPPORT_URL } = process.env;
 if (REACT_APP_SUPPORT_URL) {
 	links.push({
-		label: "Support", href: REACT_APP_SUPPORT_URL
+		label: "Support",
+		href: REACT_APP_SUPPORT_URL
 	});
 }
 
@@ -104,7 +112,7 @@ const Footer = props => {
 				<div className={classes.logoContainer}>
 					<img
 						alt={"Footer icon"}
-						src={"/images/bn-logo.png"}
+						src={servedImage("/images/bn-logo.png")}
 						className={classes.logo}
 					/>
 				</div>

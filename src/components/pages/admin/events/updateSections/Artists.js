@@ -16,6 +16,7 @@ import LeftAlignedSubCard from "../../../../elements/LeftAlignedSubCard";
 import eventUpdateStore from "../../../../../stores/eventUpdate";
 import user from "../../../../../stores/user";
 import Loader from "../../../../elements/loaders/Loader";
+import servedImage from "../../../../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	paddedContent: {
@@ -228,12 +229,30 @@ class ArtistDetails extends Component {
 
 		let icon;
 		if (spotifyArtists.hasOwnProperty(id)) {
-			icon = <img alt="Spotify" style={{ width: 20, height: 20 }} src="/images/spotify.png"/>;
+			icon = (
+				<img
+					alt="Spotify"
+					style={{ width: 20, height: 20 }}
+					src={servedImage("/images/spotify.png")}
+				/>
+			);
 		} else if (availableArtists.find(a => a.id === id)) {
-			icon = <img alt="Big Neon" style={{ width: 20, height: 20 }} src="/images/bn-logo.png"/>;
+			icon = (
+				<img
+					alt="Big Neon"
+					style={{ width: 20, height: 20 }}
+					src={servedImage("/images/bn-logo.png")}
+				/>
+			);
 		} else {
 			//Assume it's the create menu item
-			icon = <img alt="Create" style={{ width: 14, height: 14 }} src="/icons/add-active.svg"/>;
+			icon = (
+				<img
+					alt="Create"
+					style={{ width: 14, height: 14 }}
+					src={servedImage("/icons/add-active.svg")}
+				/>
+			);
 		}
 
 		return (
@@ -246,13 +265,7 @@ class ArtistDetails extends Component {
 				}}
 				{...props.innerProps}
 			>
-				{icon ?
-					(
-						<ListItemIcon>
-							{icon}
-						</ListItemIcon>
-					)
-					: null}
+				{icon ? <ListItemIcon>{icon}</ListItemIcon> : null}
 				<ListItemText inset primary={props.children}/>
 			</MenuItem>
 		);
@@ -330,9 +343,7 @@ class ArtistDetails extends Component {
 						</Button>
 					</Hidden>
 					<Hidden smDown>
-						<Button {...props}>
-							{label}
-						</Button>
+						<Button {...props}>{label}</Button>
 					</Hidden>
 				</div>
 			);
@@ -391,7 +402,10 @@ class ArtistDetails extends Component {
 									eventUpdateStore.changeArtistSetTime(index, setTime);
 								}}
 								onChangeImportance={currentImportance => {
-									eventUpdateStore.changeArtistImportance(index, currentImportance ? 0 : 1);
+									eventUpdateStore.changeArtistImportance(
+										index,
+										currentImportance ? 0 : 1
+									);
 								}}
 								imgUrl={
 									thumb_image_url || "/images/profile-pic-placeholder.png"

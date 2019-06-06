@@ -8,6 +8,7 @@ import { fontFamilyBold, fontFamilyDemiBold } from "../../../config/theme";
 import SocialIconLink from "../social/SocialIconLink";
 import createGoogleMapsLink from "../../../helpers/createGoogleMapsLink";
 import Button from "../Button";
+import servedImage from "../../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	root: {
@@ -106,7 +107,7 @@ const VenueHeaderImage = props => {
 					<a href={googleMapsLink} target="_blank" className={classes.mapLink}>
 						<img
 							className={classes.locationIcon}
-							src="/icons/location-multi.svg"
+							src={servedImage("/icons/location-multi.svg")}
 						/>
 						<Typography className={classes.viewOnMap}>View on map</Typography>
 					</a>

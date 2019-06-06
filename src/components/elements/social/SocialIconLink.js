@@ -2,6 +2,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
+import servedImage from "../../../helpers/imagePathHelper";
 
 import {
 	textColorPrimary,
@@ -85,7 +86,7 @@ const SocialIconLink = props => {
 			<img
 				style={{ height: size, width: size }}
 				className={classes.icon}
-				src={src}
+				src={servedImage(src)}
 			/>
 		</a>
 	);

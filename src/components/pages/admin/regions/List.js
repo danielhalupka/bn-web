@@ -13,6 +13,7 @@ import Dialog from "../../../elements/Dialog";
 import RegionRow from "./RegionRow";
 import Card from "../../../elements/Card";
 import { fontFamilyDemiBold } from "../../../../config/theme";
+import servedImage from "../../../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	paper: {
@@ -158,7 +159,7 @@ class RegionsList extends Component {
 									>
 										<img
 											alt={name}
-											src={`/icons/edit-gray.svg`}
+											src={servedImage(`/icons/edit-gray.svg`)}
 											className={classes.icon}
 										/>
 									</span>
@@ -171,7 +172,7 @@ class RegionsList extends Component {
 											region
 										)}
 									>
-										<img alt={name} src={`/icons/delete-gray.svg`} className={classes.icon}/>
+										<img alt={name} src={servedImage(`/icons/delete-gray.svg`)} className={classes.icon}/>
 									</span> */}
 								</Typography>
 							</RegionRow>

@@ -13,6 +13,7 @@ import user from "../../../stores/user";
 import { primaryHex, fontFamilyDemiBold } from "../../../config/theme";
 import { toolBarHeight } from "../../../config/theme";
 import boxOffice from "../../../stores/boxOffice";
+import servedImage from "../../../helpers/imagePathHelper";
 
 const displayTime = ({ event_start, door_time }) => {
 	const displayDate = moment(event_start).format("ddd, D MMM YYYY");
@@ -287,7 +288,7 @@ class BoxOfficeEventSelection extends React.Component {
 							<img
 								alt="Events icon"
 								className={classes.dropdownIcon}
-								src="/icons/down-active.svg"
+								src={servedImage("/icons/down-active.svg")}
 							/>
 						</div>
 					</span>
@@ -329,7 +330,7 @@ class BoxOfficeEventSelection extends React.Component {
 								<img
 									alt="Events icon"
 									className={classes.standaloneDropdownIcon}
-									src="/icons/down-active.svg"
+									src={servedImage("/icons/down-active.svg")}
 								/>
 							</div>
 						</span>

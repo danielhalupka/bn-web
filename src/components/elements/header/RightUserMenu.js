@@ -15,6 +15,7 @@ import NotificationList from "../../common/NotificationList";
 import { primaryHex } from "../../../config/theme";
 import { toolBarHeight } from "../../../config/theme";
 import Button from "../Button";
+import servedImage from "../../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	root: {
@@ -190,7 +191,7 @@ class RightHeaderMenu extends React.Component {
 				<img
 					alt="User icon"
 					className={classes.dropdownIcon}
-					src="/icons/down-active.svg"
+					src={servedImage("/icons/down-active.svg")}
 				/>
 			</span>
 		);

@@ -4,7 +4,9 @@ import Typography from "@material-ui/core/Typography";
 import Hidden from "@material-ui/core/Hidden";
 import { observer } from "mobx-react";
 import PropTypes from "prop-types";
-import moment from "moment";
+import { Link } from "react-router-dom";
+import moment from "moment-timezone";
+import { Redirect } from "react-router-dom";
 
 import Button from "../../elements/Button";
 import notifications from "../../../stores/notifications";
@@ -13,7 +15,7 @@ import selectedEvent from "../../../stores/selectedEvent";
 import cart from "../../../stores/cart";
 import user from "../../../stores/user";
 import EventHeaderImage from "../../elements/event/EventHeaderImage";
-import { fontFamilyDemiBold } from "../../../config/theme";
+import { fontFamilyDemiBold, secondaryHex } from "../../../config/theme";
 import EventDetailsOverlayCard from "../../elements/event/EventDetailsOverlayCard";
 import InputWithButton from "../../common/form/InputWithButton";
 import Meta from "./Meta";
@@ -24,14 +26,33 @@ import Divider from "../../common/Divider";
 import TwoColumnLayout from "./TwoColumnLayout";
 import EventDescriptionBody from "./EventDescriptionBody";
 import getUrlParam from "../../../helpers/getUrlParam";
-import { Redirect } from "react-router-dom";
+import ellipsis from "../../../helpers/ellipsis";
 
 const AUTO_SELECT_TICKET_AMOUNT = 2;
 
+const displayTime = (event_start, timezone) => {
+	const displayDate = moment(event_start)
+		.tz(timezone)
+		.format("ddd, D MMM YYYY");
+	const displayShowTime = moment(event_start)
+		.tz(timezone)
+		.format("hh:mm A");
+
+	return `${displayDate} - ${displayShowTime}`;
+};
+
 const styles = theme => ({
 	root: {},
+	desktopContent: {
+		backgroundColor: "#FFFFFF"
+	},
+	desktopCardContent: {
+		padding: theme.spacing.unit * 2
+	},
 	mobileContainer: {
-		background: "#FFFFFF",
+		background: "#FFFFFF"
+	},
+	mobileTicketSelectionContainer: {
 		padding: theme.spacing.unit * 2,
 		paddingBottom: theme.spacing.unit * 10
 	},
@@ -41,11 +62,41 @@ const styles = theme => ({
 		marginTop: theme.spacing.unit,
 		marginBottom: theme.spacing.unit
 	},
-	desktopContent: {
-		backgroundColor: "#FFFFFF"
+	mobileEventDetailsContainer: {
+		padding: theme.spacing.unit * 1.5,
+		display: "flex",
+		alignItems: "center",
+		boxShadow: "0px 2px 10px 0px rgba(157, 163, 180, 0.2)"
 	},
-	desktopCardContent: {
-		padding: theme.spacing.unit * 2
+	mobilePromoImage: {
+		width: 70,
+		height: 70,
+		backgroundRepeat: "no-repeat",
+		backgroundSize: "cover",
+		backgroundPosition: "center",
+		marginRight: theme.spacing.unit,
+		borderRadius: 6
+	},
+	mobileEventName: {
+		fontFamily: fontFamilyDemiBold,
+		fontSize: theme.typography.fontSize * 0.875,
+		color: "#2c3136",
+		overflow: "hidden",
+		textOverflow: "ellipsis"
+	},
+	mobileVenueName: {
+		fontFamily: fontFamilyDemiBold,
+		fontSize: theme.typography.fontSize * 0.8125,
+		color: "#9da3b4"
+	},
+	mobileEventTime: {
+		fontSize: theme.typography.fontSize * 0.8125,
+		color: "#9da3b4"
+	},
+	mobileViewDetailsLinkText: {
+		fontFamily: fontFamilyDemiBold,
+		fontSize: theme.typography.fontSize * 0.75,
+		color: secondaryHex
 	}
 });
 
@@ -483,6 +534,7 @@ class CheckoutSelection extends Component {
 						buttonText="Apply"
 						onSubmit={this.onSubmitPromo.bind(this)}
 						disabled={isSubmittingPromo}
+						inputDisabled={promoCodeApplied}
 						toUpperCase
 					/>
 
@@ -505,8 +557,7 @@ class CheckoutSelection extends Component {
 
 		return (
 			<div>
-				<Meta type={"selection"} {...event}/>
-
+				<Meta {...event} venue={venue} artists={artists} type={"selection"}/>
 				{/*DESKTOP*/}
 				<Hidden smDown>
 					<EventHeaderImage {...event} artists={artists}/>
@@ -538,7 +589,54 @@ class CheckoutSelection extends Component {
 
 				{/*MOBILE*/}
 				<Hidden mdUp>
-					<div className={classes.mobileContainer}>{sharedContent}</div>
+					<div className={classes.mobileContainer}>
+						{/*<div className={classes.mobileEventDetailsContainer}>*/}
+						{/*<div*/}
+						{/*className={classes.mobilePromoImage}*/}
+						{/*style={{ backgroundImage: `url(${promo_image_url})` }}*/}
+						{/*/>*/}
+						{/*<div style={{ flex: 1 }}>*/}
+						{/*<Typography*/}
+						{/*noWrap*/}
+						{/*variant={"display1"}*/}
+						{/*className={classes.mobileEventName}*/}
+						{/*>*/}
+						{/*{ellipsis(name, 45)}*/}
+						{/*</Typography>*/}
+						{/*<div*/}
+						{/*style={{*/}
+						{/*display: "flex",*/}
+						{/*justifyContent: "space-between",*/}
+						{/*flex: 1*/}
+						{/*}}*/}
+						{/*>*/}
+						{/*<div>*/}
+						{/*<Typography className={classes.mobileVenueName}>*/}
+						{/*{venue.name}*/}
+						{/*{venue.city ? ` - ${venue.city}` : ""}*/}
+						{/*</Typography>*/}
+						{/*<Typography className={classes.mobileEventTime}>*/}
+						{/*{displayTime(event.start_date, venue.timezone)}*/}
+						{/*</Typography>*/}
+						{/*</div>*/}
+						{/*<Link*/}
+						{/*to={`/events/${id}`}*/}
+						{/*style={{*/}
+						{/*display: "flex",*/}
+						{/*alignItems: "flex-end"*/}
+						{/*}}*/}
+						{/*>*/}
+						{/*<Typography className={classes.mobileViewDetailsLinkText}>*/}
+						{/*View details*/}
+						{/*</Typography>*/}
+						{/*</Link>*/}
+						{/*</div>*/}
+						{/*</div>*/}
+						{/*</div>*/}
+						<div className={classes.mobileTicketSelectionContainer}>
+							{sharedContent}
+						</div>
+					</div>
 				</Hidden>
 			</div>
 		);

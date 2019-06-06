@@ -36,6 +36,10 @@ const styles = theme => ({
 		backgroundColor: "rgb(93, 158, 198, 0.1)",
 		color: "#ACBFCB"
 	},
+	gray: {
+		backgroundColor: "rgb(93, 158, 198, 0.1)",
+		color: "#000000"
+	},
 	text: {
 		color: "inherit",
 		fontSize: theme.typography.fontSize * 0.9,
@@ -71,7 +75,7 @@ ColorTag.defaultProps = {
 
 ColorTag.propTypes = {
 	classes: PropTypes.object.isRequired,
-	variant: PropTypes.oneOf(["secondary", "green", "disabled"]),
+	variant: PropTypes.oneOf(["secondary", "green", "disabled", "gray"]),
 	children: PropTypes.oneOfType([
 		PropTypes.element,
 		PropTypes.array,

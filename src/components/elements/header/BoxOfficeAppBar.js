@@ -12,6 +12,7 @@ import { toolBarHeight } from "../../../config/theme";
 import RightUserMenu from "./RightUserMenu";
 import BoxOfficeLink from "./BoxOfficeLink";
 import BoxOfficeEventSelection from "./BoxOfficeEventSelection";
+import servedImage from "../../../helpers/imagePathHelper";
 
 const styles = theme => {
 	return {
@@ -67,7 +68,7 @@ const BoxOfficeAppBar = props => {
 							<img
 								alt="Header logo"
 								className={classes.headerImage}
-								src="/images/bn-logo.png"
+								src={servedImage("/images/bn-logo.png")}
 							/>
 						</Link>
 						<Hidden smDown>

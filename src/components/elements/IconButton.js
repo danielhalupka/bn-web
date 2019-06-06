@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import IconButton from "@material-ui/core/IconButton";
 import classNames from "classnames";
+import servedImage from "../../helpers/imagePathHelper";
 
 const styles = theme => {
 	return {
@@ -24,7 +25,11 @@ const CustomIconButton = props => {
 			}}
 			{...rest}
 		>
-			<img alt={children || ""} className={classes.icon} src={iconUrl}/>
+			<img
+				alt={children || ""}
+				className={classes.icon}
+				src={servedImage(iconUrl)}
+			/>
 		</IconButton>
 	);
 };

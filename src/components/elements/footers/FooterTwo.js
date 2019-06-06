@@ -5,6 +5,7 @@ import { Typography, Hidden } from "@material-ui/core";
 
 import { secondaryHex } from "../../../config/theme";
 import StyledLink from "../StyledLink";
+import servedImage from "../../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	root: {
@@ -81,7 +82,7 @@ const Footer = props => {
 					<div className={classes.logoContainer}>
 						<img
 							alt={"Footer icon"}
-							src={"/images/footer-logo.png"}
+							src={servedImage("/images/footer-logo.png")}
 							className={classes.logo}
 						/>
 					</div>
@@ -111,7 +112,7 @@ const Footer = props => {
 					<div className={classes.paymentLogosContainer}>
 						<img
 							alt={"Payment logos"}
-							src={"/images/payment-logos.png"}
+							src={servedImage("/images/payment-logos.png")}
 							className={classes.paymentLogos}
 						/>
 					</div>

@@ -11,6 +11,7 @@ import { fontFamilyDemiBold, fontFamily } from "../../../config/theme";
 import AppPromoCard from "../../elements/AppPromoCard";
 import Divider from "../../common/Divider";
 import Loader from "../../elements/loaders/Loader";
+import servedImage from "../../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	root: {},
@@ -200,7 +201,10 @@ class Order extends Component {
 								</Typography>
 								{this.renderStatus()}
 							</div>
-							<img src="/images/bn-logo.png" className={classes.logo}/>
+							<img
+								src={servedImage("/images/bn-logo.png")}
+								className={classes.logo}
+							/>
 						</div>
 
 						<Typography className={classes.eventName}>{eventName}</Typography>

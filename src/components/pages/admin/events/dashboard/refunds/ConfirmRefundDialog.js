@@ -5,6 +5,7 @@ import { withStyles } from "@material-ui/core/styles";
 import Dialog from "../../../../../elements/Dialog";
 import Button from "../../../../../elements/Button";
 import Typography from "@material-ui/core/Typography";
+import servedImage from "../../../../../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	content: {
@@ -24,14 +25,24 @@ const styles = theme => ({
 	}
 });
 
-const ConfirmRefundDialog = ({ isRefunding, refundComplete, classes, open, onClose, selectedTickets, onConfirm }) => {
+const ConfirmRefundDialog = ({
+	isRefunding,
+	refundComplete,
+	classes,
+	open,
+	onClose,
+	selectedTickets,
+	onConfirm
+}) => {
 	let total_value_in_cents = 0;
 	Object.keys(selectedTickets).forEach(id => {
 		const { price_in_cents } = selectedTickets[id];
 		total_value_in_cents += price_in_cents;
 	});
 
-	const totalValue = total_value_in_cents ? `$${(total_value_in_cents / 100).toFixed(2)}` : "$0";
+	const totalValue = total_value_in_cents
+		? `$${(total_value_in_cents / 100).toFixed(2)}`
+		: "$0";
 
 	let title = `Refund ${Object.keys(selectedTickets).length}`;
 
@@ -54,19 +65,25 @@ const ConfirmRefundDialog = ({ isRefunding, refundComplete, classes, open, onClo
 				{refundComplete ? (
 					<img
 						className={classes.icon}
-						src={`/icons/${
-							isRefunding ? "tickets" : "checkmark-circle"
-						}-multi.svg`}
+						src={servedImage(
+							`/icons/${isRefunding ? "tickets" : "checkmark-circle"}-multi.svg`
+						)}
 						alt="Refund complete"
 					/>
-				) : null }
+				) : null}
 
 				{Object.keys(selectedTickets).map(id => {
-					const { event_name, ticket_type, price_in_cents } = selectedTickets[id];
+					const { event_name, ticket_type, price_in_cents } = selectedTickets[
+						id
+					];
 					const value = `$${(price_in_cents / 100).toFixed(2)}`;
 
 					return (
-						<div key={id}><Typography>&bull; {ticket_type} - {event_name} - {value}</Typography> </div>
+						<div key={id}>
+							<Typography>
+								&bull; {ticket_type} - {event_name} - {value}
+							</Typography>{" "}
+						</div>
 					);
 				})}
 

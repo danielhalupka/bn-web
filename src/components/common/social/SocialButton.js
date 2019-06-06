@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
+import servedImage from "../../../helpers/imagePathHelper";
 
 import {
 	textColorPrimary,
@@ -59,7 +60,11 @@ const SocialButton = props => {
 			href={href}
 			target={href ? "_blank" : null}
 		>
-			<img style={{ height: size * 0.4 }} className={classes.icon} src={src}/>
+			<img
+				style={{ height: size * 0.4 }}
+				className={classes.icon}
+				src={servedImage(src)}
+			/>
 		</Button>
 	);
 };

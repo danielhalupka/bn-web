@@ -6,6 +6,7 @@ import classNames from "classnames";
 import { Typography, Hidden } from "@material-ui/core";
 import AppButton from "./AppButton";
 import { fontFamilyDemiBold } from "../../config/theme";
+import servedImage from "../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	root: {
@@ -166,7 +167,7 @@ const AppPromoCard = props => {
 					<img
 						className={classes.app}
 						alt="Download our app"
-						src="/images/simple-app-promo.png"
+						src={servedImage("/images/simple-app-promo.png")}
 					/>
 				</div>
 			</Hidden>

@@ -6,6 +6,7 @@ import { observer } from "mobx-react";
 
 import EventTicketsCard from "./EventTicketsCard";
 import TransferTicketsDialog from "./TransferTicketsDialog";
+import CancelTransferDialog from "./CancelTransferDialog";
 import TicketDialog from "./TicketDialog";
 import PageHeading from "../../elements/PageHeading";
 import AppPromoCard from "../../elements/AppPromoCard";
@@ -35,6 +36,7 @@ class MyEvents extends Component {
 			expandedEventId: "",
 			selectedTransferTicketIds: null,
 			selectedTicket: null,
+			cancelTransferId: null,
 			type: "upcoming"
 		};
 	}
@@ -53,6 +55,12 @@ class MyEvents extends Component {
 
 		this.setState({ type, expandedEventId });
 		tickets.refreshTickets(type);
+
+		this.refreshTickets = this.refreshTickets.bind(this);
+	}
+
+	refreshTickets() {
+		tickets.refreshTickets(this.state.type);
 	}
 
 	onExpandTickets(eventId) {
@@ -114,6 +122,9 @@ class MyEvents extends Component {
 							onShowTransferQR={selectedTransferTicketIds =>
 								this.setState({ selectedTransferTicketIds })
 							}
+							onCancelTransfer={transferId =>
+								this.setState({ cancelTransferId: transferId })
+							}
 							history={history}
 							onExpand={() => this.onExpandTickets(id)}
 						/>
@@ -134,7 +145,8 @@ class MyEvents extends Component {
 			selectedEventName,
 			selectedTicket,
 			selectedTransferTicketIds,
-			type
+			type,
+			cancelTransferId
 		} = this.state;
 
 		const { classes } = this.props;
@@ -148,12 +160,25 @@ class MyEvents extends Component {
 					open={!!selectedTicket}
 					eventName={selectedEventName}
 					ticket={selectedTicket}
-					onClose={() => this.setState({ selectedTicket: null })}
+					onClose={() =>
+						this.setState({ selectedTicket: null }, this.refreshTickets)
+					}
 				/>
 				<TransferTicketsDialog
 					open={!!selectedTransferTicketIds}
 					ticketIds={selectedTransferTicketIds}
-					onClose={() => this.setState({ selectedTransferTicketIds: null })}
+					onClose={() =>
+						this.setState(
+							{ selectedTransferTicketIds: null },
+							this.refreshTickets
+						)
+					}
+				/>
+				<CancelTransferDialog
+					transferId={cancelTransferId}
+					onClose={() =>
+						this.setState({ cancelTransferId: null }, this.refreshTickets)
+					}
 				/>
 
 				<Grid container spacing={24}>

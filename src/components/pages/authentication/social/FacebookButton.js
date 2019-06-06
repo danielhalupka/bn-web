@@ -7,6 +7,7 @@ import Button from "../../../elements/Button";
 import notifications from "../../../../stores/notifications";
 import user from "../../../../stores/user";
 import Bigneon from "../../../../helpers/bigneon";
+import servedImage from "../../../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	leftIcon: {
@@ -161,7 +162,7 @@ class FacebookButtonDisplay extends Component {
 				>
 					<img
 						className={classNames(classes.leftIcon, classes.iconSmall)}
-						src={"/images/social/facebook-icon-white.svg"}
+						src={servedImage("/images/social/facebook-icon-white.svg")}
 					/>
 					{text}
 				</Button>

@@ -109,11 +109,17 @@ class GuestList extends Component {
 				ticketIds.push(id);
 			});
 
+			const name_regex = RegExp(
+				searchQuery
+					.toLowerCase()
+					.replace(/\s+|,/g, "")
+					.split("")
+					.join(".*?")
+			);
 			if (
-				this.stringContainedInArray(
-					[first_name, last_name, ...ticketIds],
-					searchQuery
-				)
+				this.stringContainedInArray(ticketIds, searchQuery) ||
+				name_regex.test([first_name, last_name].join(" ").toLowerCase()) ||
+				name_regex.test([last_name, first_name].join(" ").toLowerCase())
 			) {
 				filteredGuests[user_id] = guests[user_id];
 			}

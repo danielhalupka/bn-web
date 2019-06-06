@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Typography, withStyles } from "@material-ui/core";
+import { Typography, withStyles, Hidden } from "@material-ui/core";
 
 import notifications from "../../../../../../stores/notifications";
 import Button from "../../../../../elements/Button";
@@ -13,6 +13,7 @@ import Dialog from "../../../../../elements/Dialog";
 import Loader from "../../../../../elements/loaders/Loader";
 import user from "../../../../../../stores/user";
 import { secondaryHex } from "../../../../../../config/theme";
+import copyToClipboard from "../../../../../../helpers/copyToClipboard";
 
 const styles = theme => ({
 	root: {},
@@ -23,6 +24,11 @@ const styles = theme => ({
 	shareableLinkText: {
 		color: secondaryHex,
 		fontSize: theme.typography.fontSize * 0.9
+	},
+	desktopHeadingRow: {
+		display: "flex",
+		paddingLeft: theme.spacing.unit * 2,
+		paddingRight: theme.spacing.unit * 2
 	}
 });
 
@@ -38,7 +44,10 @@ class TicketHoldList extends Component {
 			showHoldDialog: null,
 			ticketTypes: [],
 			holds: [],
-			deleteId: null
+			deleteId: null,
+			linkCopiedId: null,
+			linkIsCopied: false,
+			expandRowId: null
 		};
 	}
 
@@ -116,8 +125,80 @@ class TicketHoldList extends Component {
 			});
 	}
 
+	copyToClipboard(id) {
+		const { linkCopiedId, holds } = this.state;
+
+		const autoClose = () =>
+			setTimeout(() => {
+				const { linkCopiedId } = this.state;
+				if (id === linkCopiedId) {
+					this.setState({ linkCopiedId: null });
+				}
+			}, 2000);
+
+		let url = null;
+		if (id) {
+			const hold = holds.find(c => c.id === id);
+			const { redemption_code, event_id } = hold;
+
+			url = `${window.location.protocol}//${
+				window.location.host
+			}/events/${event_id}/tickets?code=${redemption_code}`;
+		}
+
+		if (url) {
+			copyToClipboard(url);
+			this.setState({ linkCopiedId: id }, () => {
+				this.setState({ linkIsCopied: true });
+				autoClose();
+			});
+		}
+	}
+
+	renderDesktopHeadings() {
+		const { classes } = this.props;
+		const headings = [
+			"Name",
+			"Code",
+			"Ticket Type",
+			"Claimed from hold",
+			"Remaining",
+			"Action"
+		];
+
+		const columnStyles = [
+			{ flex: 3, textAlign: "left" },
+			{ flex: 2, textAlign: "left" },
+			{ flex: 3, textAlign: "center" },
+			{ flex: 2, textAlign: "center" },
+			{ flex: 2, textAlign: "center" },
+			{ flex: 2, textAlign: "left" },
+			{ flex: 2, textAlign: "right" }
+		];
+
+		return (
+			<div className={classes.desktopHeadingRow}>
+				{headings.map((heading, index) => (
+					<Typography
+						key={index}
+						className={classes.desktopHeadingText}
+						style={columnStyles[index]}
+					>
+						{heading}
+					</Typography>
+				))}
+			</div>
+		);
+	}
+
 	renderList() {
-		const { holds, activeHoldId, showHoldDialog } = this.state;
+		const {
+			holds,
+			activeHoldId,
+			showHoldDialog,
+			expandRowId,
+			linkCopiedId
+		} = this.state;
 
 		if (holds === null) {
 			return <Loader/>;
@@ -154,13 +235,14 @@ class TicketHoldList extends Component {
 				}
 
 				if (action === "Link") {
-					return this.setState({ showShareableLinkId: id });
+					// return this.setState({ showShareableLinkId: id });
+					return this.copyToClipboard(id);
 				}
 			};
 
 			return (
 				<div>
-					<HoldRow heading>{ths}</HoldRow>
+					<Hidden smDown>{this.renderDesktopHeadings()}</Hidden>
 					{holds.map((hold, index) => {
 						const {
 							id,
@@ -197,7 +279,7 @@ class TicketHoldList extends Component {
 						];
 
 						const active = activeHoldId === id && showHoldDialog;
-						const iconColor = active ? "white" : "gray";
+						const iconColor = active ? "white" : "active";
 						return (
 							<HoldRow
 								active={active}
@@ -209,25 +291,27 @@ class TicketHoldList extends Component {
 											{
 												id: id,
 												name: "Split",
-												iconUrl: `/icons/split-${iconColor}.svg`,
+												iconName: "split",
 												onClick: onAction.bind(this)
 											},
 											{
 												id: id,
 												name: "Link",
-												iconUrl: `/icons/link-${iconColor}.svg`,
+												iconName: "link",
+												tooltipText:
+														linkCopiedId === id ? "Link Copied!" : null,
 												onClick: onAction.bind(this)
 											},
 											{
 												id: id,
 												name: "Edit",
-												iconUrl: `/icons/edit-${iconColor}.svg`,
+												iconName: "edit",
 												onClick: onAction.bind(this)
 											},
 											{
 												id: id,
 												name: "Delete",
-												iconUrl: `/icons/delete-${iconColor}.svg`,
+												iconName: "delete",
 												onClick: onAction.bind(this)
 											}
 										  ]
@@ -235,10 +319,14 @@ class TicketHoldList extends Component {
 											{
 												id: id,
 												name: "Link",
-												iconUrl: `/icons/link-${iconColor}.svg`,
+												iconName: "link",
 												onClick: onAction.bind(this)
 											}
 										  ]
+								}
+								expanded={expandRowId === id}
+								onExpand={() =>
+									this.setState({ expandRowId: expandRowId === id ? null : id })
 								}
 							>
 								{tds}
@@ -341,6 +429,7 @@ class TicketHoldList extends Component {
 						<Button style={{ flex: 1 }} onClick={onClose}>
 							Done
 						</Button>
+						s
 					</div>
 				</div>
 			</Dialog>

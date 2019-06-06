@@ -15,6 +15,7 @@ import Bigneon from "../../../../../helpers/bigneon";
 import notifications from "../../../../../stores/notifications";
 import Loader from "../../../../elements/loaders/Loader";
 import { observer } from "mobx-react";
+import servedImage from "../../../../../helpers/imagePathHelper";
 
 const styles = theme => {
 	return {
@@ -81,7 +82,9 @@ const NumberCard = ({ classes, label, active, value, iconName }) => {
 				<div className={classes.numbersCardRow}>
 					<img
 						className={classes.numbersCardIcon}
-						src={`/icons/${iconName}-${active ? "white" : "active"}.svg`}
+						src={servedImage(
+							`/icons/${iconName}-${active ? "white" : "active"}.svg`
+						)}
 						alt={iconName}
 					/>
 					<Typography
@@ -330,7 +333,7 @@ class Summary extends Component {
 						alignItems="center"
 					>
 						<img
-							src="/images/no_sales_data_illustration.png"
+							src={servedImage("/images/no_sales_data_illustration.png")}
 							style={{ margin: 50, width: 200 }}
 						/>
 						<Typography variant="title">

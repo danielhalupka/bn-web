@@ -8,6 +8,7 @@ import GuestTicketRow from "./GuestTicketRow";
 import CheckBox from "../../../elements/form/CheckBox";
 import { dollars } from "../../../../helpers/money";
 import StyledLink from "../../../elements/StyledLink";
+import servedImage from "../../../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	root: {
@@ -78,7 +79,7 @@ const DiscountIcon = ({ classes }) => (
 	<img
 		className={classes.paymentRequiredIcon}
 		alt={"Payment required"}
-		src={"/icons/sales-active.svg"}
+		src={servedImage("/icons/sales-active.svg")}
 	/>
 );
 
@@ -239,7 +240,9 @@ const GuestRow = props => {
 						<img
 							alt="Expand icon"
 							className={classes.expandIcon}
-							src={expanded ? "/icons/up-active.svg" : "/icons/down-active.svg"}
+							src={servedImage(
+								expanded ? "/icons/up-active.svg" : "/icons/down-active.svg"
+							)}
 						/>
 					</div>
 				</div>

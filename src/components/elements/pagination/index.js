@@ -8,6 +8,7 @@ import { fontFamilyDemiBold, secondaryHex } from "../../../config/theme";
 import changeUrlParam from "../../../helpers/changeUrlParam";
 import getUrlParam from "../../../helpers/getUrlParam";
 import classnames from "classnames";
+import servedImage from "../../../helpers/imagePathHelper";
 
 const styles = theme => {
 	return {
@@ -222,7 +223,7 @@ class PaginationBlock extends Component {
 							[classes.endPointActionIconDisabled]: previousDisabled
 						})}
 						alt="Previous page"
-						src="/icons/left-active.svg"
+						src={servedImage("/icons/left-active.svg")}
 					/>
 					<Typography
 						className={classnames({
@@ -251,7 +252,7 @@ class PaginationBlock extends Component {
 							[classes.endPointActionIconDisabled]: nextDisabled
 						})}
 						alt="Next page"
-						src="/icons/right-active.svg"
+						src={servedImage("/icons/right-active.svg")}
 					/>
 				</div>
 			</div>

@@ -6,6 +6,7 @@ import Button from "../elements/Button";
 import { Typography, withStyles } from "@material-ui/core";
 import { fontFamilyDemiBold } from "../../config/theme";
 import errorReporting from "../../helpers/errorReporting";
+import servedImage from "../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	root: {
@@ -28,7 +29,10 @@ const styles = theme => ({
 
 class NotFound extends Component {
 	componentDidMount() {
-		errorReporting.captureMessage(`React route not found: ${window.location.pathname}`, "warning");
+		errorReporting.captureMessage(
+			`React route not found: ${window.location.pathname}`,
+			"warning"
+		);
 	}
 
 	render() {
@@ -36,8 +40,14 @@ class NotFound extends Component {
 
 		return (
 			<div className={classes.root}>
-				<img className={classes.image} alt={"Page not found"} src="/images/not-found.png"/>
-				<Typography className={classes.heading}>{children || "Page not found"}</Typography>
+				<img
+					className={classes.image}
+					alt={"Page not found"}
+					src={servedImage("/images/not-found.png")}
+				/>
+				<Typography className={classes.heading}>
+					{children || "Page not found"}
+				</Typography>
 				<Link to="/">
 					<Button variant={"callToAction"}>Home</Button>
 				</Link>

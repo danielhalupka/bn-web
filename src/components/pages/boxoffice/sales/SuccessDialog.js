@@ -4,6 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 
 import Dialog from "../../../elements/Dialog";
 import Button from "../../../elements/Button";
+import servedImage from "../../../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	content: {
@@ -29,7 +30,7 @@ const SuccessDialog = ({ message, classes, onClose }) => {
 			<div className={classes.content}>
 				<img
 					className={classes.icon}
-					src="/icons/checkmark-circle-multi.svg"
+					src={servedImage("/icons/checkmark-circle-multi.svg")}
 					alt={message}
 				/>
 

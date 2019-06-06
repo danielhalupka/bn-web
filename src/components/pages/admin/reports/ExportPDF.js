@@ -17,6 +17,7 @@ import Audit from "./eventAudit/Audit";
 import SummaryAudit from "./eventSummaryAudit/SummaryAudit";
 import EventPromoCodesReport from "./eventPromoCode/EventPromoCode.js";
 import user from "../../../../stores/user";
+import servedImage from "../../../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	root: {
@@ -149,7 +150,7 @@ class ExportPDF extends Component {
 					<img
 						alt="Header logo"
 						className={classes.logo}
-						src={"/images/bn-logo-text-web.svg"}
+						src={servedImage("/images/bn-logo-text-web.svg")}
 					/>
 
 					<div>

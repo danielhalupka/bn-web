@@ -15,7 +15,7 @@ import optimizedImageUrl from "../../../helpers/optimizedImageUrl";
 import TwoColumnLayout from "../../pages/events/TwoColumnLayout";
 
 const styles = theme => {
-	return ({
+	return {
 		coverImageContainer: {
 			width: "100%",
 			overflow: "hidden",
@@ -76,7 +76,7 @@ const styles = theme => {
 			fontSize: 25,
 			lineHeight: 0.9
 		}
-	});
+	};
 };
 
 const EventHeaderImage = props => {
@@ -101,7 +101,11 @@ const EventHeaderImage = props => {
 					[classes.noCoverImage]: !cover_image_url
 				})}
 				style={{
-					backgroundImage: cover_image_url ? `linear-gradient(to top, #000000, rgba(0, 0, 0, 0)),url(${optimizedImageUrl(cover_image_url)})` : null,
+					backgroundImage: cover_image_url
+						? `linear-gradient(to top, #000000, rgba(0, 0, 0, 0)),url(${optimizedImageUrl(
+							cover_image_url
+						  )})`
+						: null,
 					height: height * 1.1
 				}}
 			/>
@@ -116,7 +120,11 @@ const EventHeaderImage = props => {
 							</Typography>
 						) : null}
 						<Typography
-							className={classNames({ [classes.eventNameText]: true, [classes.eventNameTextLong]: eventNameIsLong })}
+							variant={"display1"}
+							className={classNames({
+								[classes.eventNameText]: true,
+								[classes.eventNameTextLong]: eventNameIsLong
+							})}
 						>
 							{name}
 						</Typography>

@@ -14,6 +14,7 @@ import StyledLink from "../../../elements/StyledLink";
 import Loader from "../../../elements/loaders/Loader";
 import PropTypes from "prop-types";
 import moment from "moment-timezone";
+import servedImage from "../../../../helpers/imagePathHelper";
 
 const imageSize = 100;
 
@@ -138,10 +139,7 @@ class Fan extends Component {
 					activities.push({ ...item, type: "Attendance" });
 				});
 
-				this.setState(
-					{ profile, activities },
-					this.loadFanHistory.bind(this)
-				);
+				this.setState({ profile, activities }, this.loadFanHistory.bind(this));
 			})
 			.catch(error =>
 				notifications.showFromErrorResponse({
@@ -220,7 +218,7 @@ class Fan extends Component {
 			<div className={classes.missingProfileImageContainer}>
 				<img
 					className={classes.missingProfileImage}
-					src={"/images/profile-pic-placeholder.png"}
+					src={servedImage("/images/profile-pic-placeholder.png")}
 					alt={first_name}
 				/>
 			</div>

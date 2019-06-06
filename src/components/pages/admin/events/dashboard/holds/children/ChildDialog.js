@@ -8,6 +8,7 @@ import Button from "../../../../../../elements/Button";
 import Bigneon from "../../../../../../../helpers/bigneon";
 import Dialog from "../../../../../../elements/Dialog";
 import InputGroup from "../../../../../../common/form/InputGroup";
+import { CODE_TYPES } from "../../codes/CodeDialog";
 
 const createHold = BnServer.ResourceInterfaces.createHold;
 
@@ -16,6 +17,12 @@ const styles = {
 	group: {
 		// margin: `${theme.spacing.unit}px 0`,
 	}
+};
+
+export const HOLD_TYPES = {
+	EDIT: "edit",
+	NEW: "new",
+	SPLIT: "split"
 };
 
 class ChildDialog extends React.Component {
@@ -48,7 +55,12 @@ class ChildDialog extends React.Component {
 			.holds.read({ id: holdId })
 			.then(response => {
 				const hold = response.data;
-				this.setState({ hold });
+
+				this.setState({ hold: hold });
+
+				if (this.props.holdType == "edit") {
+					this.setState({ child: hold });
+				}
 			})
 			.catch(error => {
 				notifications.showFromErrorResponse({
@@ -56,6 +68,24 @@ class ChildDialog extends React.Component {
 					defaultMessage: "Failed to load hold."
 				});
 			});
+	}
+
+	refreshChildren() {
+		if (this.props.holdId) {
+			Bigneon()
+				.holds.children.index({ hold_id: this.props.holdId })
+				.then(response => {
+					//TODO Pagination
+
+					this.setState({ child: response.data.data });
+				})
+				.catch(error => {
+					notifications.showFromErrorResponse({
+						error,
+						defaultMessage: "Refreshing holds failed."
+					});
+				});
+		}
 	}
 
 	validateFields() {
@@ -101,9 +131,11 @@ class ChildDialog extends React.Component {
 		}
 
 		const { child, hold } = this.state;
-		const { onSuccess } = this.props;
+		const { onSuccess, holdType } = this.props;
 
 		this.setState({ isSubmitting: true });
+
+		let storeFunction;
 
 		const { ...saveData } = child;
 		if (saveData.email === "") {
@@ -111,6 +143,9 @@ class ChildDialog extends React.Component {
 		}
 		if (saveData.phone === "") {
 			delete saveData.phone;
+		}
+		if (saveData.quantity) {
+			saveData.quantity = Number(saveData.quantity);
 		}
 
 		const { id, hold_type, discount_in_cents, max_per_order, end_at } = hold;
@@ -121,28 +156,58 @@ class ChildDialog extends React.Component {
 			max_per_order,
 			end_at
 		};
+		switch (holdType) {
+			case HOLD_TYPES.NEW:
+				Bigneon()
+					.holds.children.create({ ...parentHoldInheritance, ...saveData })
+					.then(response => {
+						const { id } = response.data;
+						this.setState({ isSubmitting: false });
+						const message = `Successfully ${
+							child.id ? "updated" : "added"
+						} name`;
+						notifications.show({
+							message,
+							variant: "success"
+						});
+						onSuccess(id);
+					})
+					.catch(error => {
+						console.error(error);
+						this.setState({ isSubmitting: false });
 
-		Bigneon()
-			.holds.children.create({ ...parentHoldInheritance, ...saveData })
-			.then(response => {
-				const { id } = response.data;
-				this.setState({ isSubmitting: false });
-				const message = `Successfully ${child.id ? "updated" : "added"} name`;
-				notifications.show({
-					message,
-					variant: "success"
-				});
-				onSuccess(id);
-			})
-			.catch(error => {
-				console.error(error);
-				this.setState({ isSubmitting: false });
+						notifications.showFromErrorResponse({
+							error,
+							defaultMessage: `${child.id ? "Update" : "Create"} name failed.`
+						});
+					});
+				break;
+			case HOLD_TYPES.EDIT:
+				Bigneon()
+					.holds.update({ ...parentHoldInheritance, ...saveData })
+					.then(response => {
+						const { id } = response.data;
+						this.setState({ isSubmitting: false });
+						const message = `Successfully ${
+							child.id ? "updated" : "added"
+						} name`;
+						notifications.show({
+							message,
+							variant: "success"
+						});
+						onSuccess(id);
+					})
+					.catch(error => {
+						console.error(error);
+						this.setState({ isSubmitting: false });
 
-				notifications.showFromErrorResponse({
-					error,
-					defaultMessage: `${child.id ? "Update" : "Create"} name failed.`
-				});
-			});
+						notifications.showFromErrorResponse({
+							error,
+							defaultMessage: `${child.id ? "Update" : "Create"} name failed.`
+						});
+					});
+				break;
+		}
 	}
 
 	render() {
@@ -153,17 +218,30 @@ class ChildDialog extends React.Component {
 			ticketTypes,
 			eventId,
 			onSuccess,
+			holdType,
 			...other
 		} = this.props;
 
 		const iconUrl = "/icons/tickets-white.svg";
 
 		const { child, errors } = this.state;
+		let title = "Add Name to";
+		let saveButtonText = "Create";
+
+		switch (holdType) {
+			case HOLD_TYPES.NEW:
+				title = "Add Name to";
+				break;
+			case HOLD_TYPES.EDIT:
+				title = "Update";
+				saveButtonText = "Update";
+				break;
+		}
 
 		return (
 			<Dialog
 				onClose={onClose}
-				title="Add Name to Hold"
+				title={`${title} hold`}
 				iconUrl={iconUrl}
 				{...other}
 			>
@@ -223,9 +301,9 @@ class ChildDialog extends React.Component {
 						name="quantity"
 						label="Total Tickets"
 						placeholder="1"
-						type="text"
+						type="number"
 						onChange={e => {
-							child.quantity = +e.target.value;
+							child.quantity = e.target.value;
 							this.setState({ child });
 						}}
 						// onBlur={this.validateFields.bind(this)}
@@ -246,7 +324,7 @@ class ChildDialog extends React.Component {
 						variant="callToAction"
 						onClick={this.submit.bind(this)}
 					>
-						Create
+						{saveButtonText}
 					</Button>
 				</div>
 			</Dialog>
@@ -258,6 +336,7 @@ ChildDialog.propTypes = {
 	classes: PropTypes.object.isRequired,
 	holdId: PropTypes.string.isRequired,
 	eventId: PropTypes.string,
+	holdType: PropTypes.string,
 	ticketTypes: PropTypes.array,
 	onClose: PropTypes.func.isRequired,
 	onSuccess: PropTypes.func.isRequired

@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import Typography from "@material-ui/core/Typography";
+import servedImage from "../../../helpers/imagePathHelper";
 
 const styles = theme => {
 	return {
@@ -44,7 +45,7 @@ const StatsCard = props => {
 				{label}
 			</Typography>
 			<div className={classes.row}>
-				<img alt={label} src={iconUrl} className={classes.icon}/>
+				<img alt={label} src={servedImage(iconUrl)} className={classes.icon}/>
 				<Typography variant="title" className={classes.value}>
 					{value}
 				</Typography>

@@ -5,6 +5,7 @@ import Avatar from "@material-ui/core/Avatar";
 
 import notifications from "../../../stores/notifications";
 import cloudinaryWidget from "../../../helpers/cloudinaryWidget";
+import servedImage from "../../../helpers/imagePathHelper";
 
 const imageSize = 170;
 
@@ -125,7 +126,7 @@ class ProfilePicture extends Component {
 					<div className={classes.missingImageContainer}>
 						<img
 							className={classes.missingImage}
-							src={"/images/profile-pic-placeholder.png"}
+							src={servedImage("/images/profile-pic-placeholder.png")}
 							alt={"Profile picture"}
 						/>
 					</div>

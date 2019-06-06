@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import classNames from "classnames";
+import servedImage from "../../helpers/imagePathHelper";
 
 import {
 	textColorPrimary,
@@ -132,7 +133,11 @@ const CustomButton = props => {
 			{...rest}
 		>
 			{iconUrl ? (
-				<img alt={children} className={classes.leftIcon} src={iconUrl}/>
+				<img
+					alt={children}
+					className={classes.leftIcon}
+					src={servedImage(iconUrl)}
+				/>
 			) : null}
 
 			{children}
@@ -140,7 +145,7 @@ const CustomButton = props => {
 				<img
 					alt={children}
 					className={classes.addIcon}
-					src={"/icons/add-active.svg"}
+					src={servedImage("/icons/add-active.svg")}
 				/>
 			) : null}
 		</Button>

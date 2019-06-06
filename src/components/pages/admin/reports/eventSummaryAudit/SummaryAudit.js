@@ -16,48 +16,6 @@ import reportDateRangeHeading from "../../../../../helpers/reportDateRangeHeadin
 import user from "../../../../../stores/user";
 import { observer } from "mobx-react";
 
-//Temp solution to group price points if they have the same name and price
-//If the API performs this function in the future, this code can be removed
-//Iterates through price points and merges number values for price points that have the same pricing_name and price_in_cents
-const groupPricePointsByNameAndPrice = data => {
-	Object.keys(data).forEach(ticket_type_id => {
-		const ticketType = data[ticket_type_id];
-		const { pricePoints } = ticketType;
-		const mergedPricePoints = [];
-
-		pricePoints.forEach(pricePoint => {
-			let existingIndex = -1;
-			mergedPricePoints.forEach((mergedPoint, index) => {
-				if (
-					mergedPoint.pricing_name === pricePoint.pricing_name &&
-					mergedPoint.price_in_cents === pricePoint.price_in_cents &&
-					mergedPoint.hold_id === pricePoint.hold_id
-				) {
-					existingIndex = index;
-				}
-			});
-
-			if (existingIndex < 0) {
-				mergedPricePoints.push(pricePoint);
-			} else {
-				//Merge results
-				Object.keys(pricePoint).forEach(pricePointKey => {
-					const pricePointValue = pricePoint[pricePointKey];
-					if (pricePointKey !== "price_in_cents" && !isNaN(pricePointValue)) {
-						//Add it up
-						mergedPricePoints[existingIndex][pricePointKey] =
-							mergedPricePoints[existingIndex][pricePointKey] + pricePointValue;
-					}
-				});
-			}
-		});
-
-		data[ticket_type_id].pricePoints = mergedPricePoints;
-	});
-
-	return data;
-};
-
 export const eventSummaryData = (queryParams, onSuccess, onError) => {
 	//TODO can probably use ticket count report
 	Bigneon()
@@ -173,8 +131,8 @@ export const eventSummaryData = (queryParams, onSuccess, onError) => {
 			}
 
 			onSuccess({
-				eventSales: groupPricePointsByNameAndPrice(eventSales),
-				revenueShare: groupPricePointsByNameAndPrice(revenueShare),
+				eventSales,
+				revenueShare,
 				salesTotals,
 				revenueTotals,
 				otherFees

@@ -4,6 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import { fontFamilyDemiBold, primaryHex } from "../../config/theme";
 import classnames from "classnames";
+import servedImage from "../../helpers/imagePathHelper";
 
 const styles = theme => ({
 	root: {
@@ -82,7 +83,7 @@ const PaymentOptionCard = props => {
 			})}
 		>
 			<div className={classes.iconContainer}>
-				<img alt={type} className={classes.icon} src={iconUrl}/>
+				<img alt={type} className={classes.icon} src={servedImage(iconUrl)}/>
 			</div>
 			<div className={classes.textContainer}>
 				<Typography

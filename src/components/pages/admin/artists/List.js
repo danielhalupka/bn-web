@@ -10,6 +10,7 @@ import Button from "../../../elements/Button";
 import Bigneon from "../../../../helpers/bigneon";
 import PageHeading from "../../../elements/PageHeading";
 import Loader from "../../../elements/loaders/Loader";
+import user from "../../../../stores/user";
 
 const styles = theme => ({
 	paper: {
@@ -86,7 +87,8 @@ class ArtistsList extends Component {
 					name,
 					youtube_video_urls,
 					website_url,
-					thumb_image_url
+					thumb_image_url,
+					is_private
 				} = artist;
 				const videoCount = youtube_video_urls ? youtube_video_urls.length : 0;
 
@@ -111,11 +113,13 @@ class ArtistsList extends Component {
 								</a>
 							</CardContent>
 
-							<div className={classes.actionButtons}>
-								<Link to={`/admin/artists/${id}`} style={{ marginRight: 10 }}>
-									<Button variant="primary">Edit details</Button>
-								</Link>
-							</div>
+							{is_private || user.isAdmin ? (
+								<div className={classes.actionButtons}>
+									<Link to={`/admin/artists/${id}`} style={{ marginRight: 10 }}>
+										<Button variant="primary">Edit details</Button>
+									</Link>
+								</div>
+							) : null}
 						</Card>
 					</Grid>
 				);

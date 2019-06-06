@@ -6,7 +6,8 @@ import {
 	Typography,
 	InputAdornment,
 	Collapse,
-	Hidden
+	Hidden,
+	Grid
 } from "@material-ui/core";
 import classnames from "classnames";
 import Bn from "bn-api-node";
@@ -18,7 +19,6 @@ import DateTimePickerGroup from "../../../../common/form/DateTimePickerGroup";
 import PricePoint from "./PricePoint";
 import eventUpdateStore from "../../../../../stores/eventUpdate";
 import SelectGroup from "../../../../common/form/SelectGroup";
-import CheckBox from "../../../../elements/form/CheckBox";
 
 const styles = theme => {
 	return {
@@ -47,24 +47,15 @@ const styles = theme => {
 			textTransform: "uppercase",
 			fontFamily: "TTCommons-DemiBold"
 		},
-		simpleInputs: {
-			display: "flex"
-		},
 		simpleInputContainer: {
-			flex: 1,
 			paddingRight: theme.spacing.unit * 4,
 
 			[theme.breakpoints.down("sm")]: {
 				paddingRight: theme.spacing.unit
 			}
 		},
-		additionalInputsRow: {
-			display: "flex"
-		},
 		additionalInputContainer: {
-			flex: 1,
 			paddingRight: theme.spacing.unit * 4,
-			display: "flex",
 			alignItems: "center",
 
 			[theme.breakpoints.down("sm")]: {
@@ -164,7 +155,10 @@ const TicketDetails = observer(props => {
 		visibility,
 		isCancelled,
 		parentId,
-		ticketTypes
+		ticketTypes,
+		showMaxTicketsPerCustomer,
+		showVisibility,
+		showCartQuantityIncrement
 	} = props;
 
 	let useEndDate = endDate;
@@ -223,12 +217,26 @@ const TicketDetails = observer(props => {
 	const onShowAdditionalOptions = () =>
 		updateTicketType(index, { showAdditionalOptions: true });
 
+	const showCustomStartTimes = saleStartTimeOption === "custom";
+	const showStartSaleWhenTicketSaleEnds = saleStartTimeOption === "parent";
+
+	const showCustomEndTime = saleEndTimeOption === "custom";
+
+	const saleStartOptions = [
+		{ value: "immediately", label: "Immediately" },
+		{ value: "custom", label: "At a specific time" }
+	];
+
+	if (parentTicketTypes.length > 0) {
+		saleStartOptions.push({ value: "parent", label: "When sales end for..." });
+	}
+
 	return (
 		<div className={classes.activeContent}>
 			<TicketHeading {...props}/>
 
-			<div className={classes.simpleInputs}>
-				<div className={classes.simpleInputContainer} style={{ flex: 2 }}>
+			<Grid container spacing={32}>
+				<Grid className={classes.simpleInputContainer} item xs={12} sm={6}>
 					<InputGroup
 						disabled={isCancelled}
 						error={errors.name}
@@ -242,9 +250,9 @@ const TicketDetails = observer(props => {
 						}}
 						onBlur={validateFields}
 					/>
-				</div>
+				</Grid>
 
-				<div className={classes.simpleInputContainer}>
+				<Grid className={classes.simpleInputContainer} item xs={6} sm={3}>
 					<InputGroup
 						disabled={isCancelled}
 						error={errors.capacity}
@@ -258,9 +266,9 @@ const TicketDetails = observer(props => {
 						}}
 						onBlur={validateFields}
 					/>
-				</div>
+				</Grid>
 
-				<div className={classes.simpleInputContainer}>
+				<Grid className={classes.simpleInputContainer} item xs={6} sm={3}>
 					<InputGroup
 						disabled={isCancelled}
 						InputProps={{
@@ -279,8 +287,8 @@ const TicketDetails = observer(props => {
 						}}
 						onBlur={validateFields}
 					/>
-				</div>
-			</div>
+				</Grid>
+			</Grid>
 
 			{!showAdditionalOptions ? (
 				<div>
@@ -302,23 +310,17 @@ const TicketDetails = observer(props => {
 			) : null}
 
 			<Collapse in={!!showAdditionalOptions}>
-				<div className={classes.additionalInputsRow}>
-					<div
+				<Grid container spacing={32}>
+					<Grid
 						className={classes.additionalInputContainer}
-						style={{ marginBottom: 10 }}
+						item
+						xs={12}
+						sm={6}
 					>
 						<SelectGroup
 							disabled={isCancelled}
-							value={saleStartTimeOption || "custom"}
-							items={
-								parentTicketTypes.length > 0
-									? [
-										{ value: "parent", label: "When sales end for..." },
-
-										{ value: "custom", label: "At a specific time" }
-									  ]
-									: [{ value: "custom", label: "At a specific time" }]
-							}
+							value={saleStartTimeOption || "immediately"}
+							items={saleStartOptions}
 							name={"sales-start-times"}
 							label={"Sales start *"}
 							onChange={e => {
@@ -332,17 +334,21 @@ const TicketDetails = observer(props => {
 								});
 							}}
 						/>
-					</div>
-				</div>
-				{(saleStartTimeOption || "custom") === "custom" ? (
-					<div className={classes.additionalInputsRow}>
-						<div className={classes.additionalInputContainer}>
+					</Grid>
+
+					{showCustomStartTimes ? (
+						<Grid
+							className={classes.additionalInputContainer}
+							item
+							xs={6}
+							sm={3}
+						>
 							<DateTimePickerGroup
 								disabled={isCancelled}
 								error={errors.startDate}
 								value={startDate}
 								name="startDate.date"
-								label="Sale start date *"
+								label="Start date *"
 								type="date"
 								onChange={startDate =>
 									updateTicketType(index, { parentId: null, startDate })
@@ -350,14 +356,22 @@ const TicketDetails = observer(props => {
 								onBlur={validateFields}
 								minDate={false}
 							/>
-						</div>
-						<div className={classes.additionalInputContainer}>
+						</Grid>
+					) : null}
+
+					{showCustomStartTimes ? (
+						<Grid
+							className={classes.additionalInputContainer}
+							item
+							xs={6}
+							sm={3}
+						>
 							<DateTimePickerGroup
 								disabled={isCancelled}
 								error={errors.startTime}
 								value={startTime}
 								name="startTime"
-								label="Sale start time *"
+								label="Start time *"
 								type="time"
 								onChange={startTime =>
 									updateTicketType(index, { parentId: null, startTime })
@@ -365,17 +379,22 @@ const TicketDetails = observer(props => {
 								onBlur={validateFields}
 								minDate={false}
 							/>
-						</div>
-					</div>
-				) : (
-					<div className={classes.additionalInputsRow}>
-						<div className={classes.additionalInputContainer}>
+						</Grid>
+					) : null}
+
+					{showStartSaleWhenTicketSaleEnds ? (
+						<Grid
+							className={classes.additionalInputContainer}
+							item
+							xs={12}
+							sm={6}
+						>
 							<SelectGroup
 								disabled={isCancelled}
 								error={errors.parentId}
 								value={parentId}
 								name="parentId"
-								label="Ticket *"
+								label="Select ticket type *"
 								items={parentTicketTypes.map(tt => {
 									return {
 										value: tt.inner.id || tt.index,
@@ -390,67 +409,84 @@ const TicketDetails = observer(props => {
 									})
 								}
 							/>
-						</div>
-					</div>
-				)}
-				<div className={classes.additionalInputsRow}>
-					<div
+						</Grid>
+					) : null}
+				</Grid>
+
+				<Grid container spacing={32}>
+					<Grid
 						className={classes.additionalInputContainer}
-						style={{ marginBottom: 10 }}
+						item
+						xs={12}
+						sm={6}
 					>
 						<SelectGroup
 							disabled={isCancelled}
 							value={saleEndTimeOption || "close"}
 							items={[
-								{ value: "door", label: "Event Door Time" },
-								{ value: "start", label: "Event Start Time" },
-								{ value: "close", label: "Event End Time" },
-								{ value: "custom", label: "Custom" }
+								{ value: "door", label: "Door Time" },
+								{ value: "start", label: "Event Start" },
+								{ value: "close", label: "Event End" },
+								{ value: "custom", label: "At a specific time" }
 							]}
 							name={"close-times"}
-							label={"Ticket sale end time *"}
+							label={"Sales end *"}
 							onChange={e => {
-								updateTicketType(index, { saleEndTimeOption: e.target.value });
+								updateTicketType(index, {
+									saleEndTimeOption: e.target.value
+								});
 							}}
 						/>
-					</div>
-				</div>
-				{saleEndTimeOption === "custom" ? (
-					<div className={classes.additionalInputsRow}>
-						<div className={classes.additionalInputContainer}>
+					</Grid>
+
+					{showCustomEndTime ? (
+						<Grid
+							className={classes.additionalInputContainer}
+							item
+							xs={6}
+							sm={3}
+						>
 							<DateTimePickerGroup
 								disabled={isCancelled}
 								error={errors.endDate}
 								value={useEndDate}
 								name="endDate"
 								type="date"
-								label="Sale end date *"
+								label="End date *"
 								onChange={endDate => {
 									updateTicketType(index, { endDate });
 								}}
 								onBlur={validateFields}
 								minDate={false}
 							/>
-						</div>
-						<div className={classes.additionalInputContainer}>
+						</Grid>
+					) : null}
+
+					{showCustomEndTime ? (
+						<Grid
+							className={classes.additionalInputContainer}
+							item
+							xs={6}
+							sm={3}
+						>
 							<DateTimePickerGroup
 								disabled={isCancelled}
 								error={errors.endTime}
 								value={useEndTime}
 								name="endTime"
 								type="time"
-								label="Sale end time *"
+								label="End time *"
 								onChange={endTime => {
 									updateTicketType(index, { endTime });
 								}}
 								onBlur={validateFields}
 								minDate={false}
 							/>
-						</div>
-					</div>
-				) : null}
+						</Grid>
+					) : null}
+				</Grid>
 
-				<div className={classes.additionalInputsRow}>
+				<Grid container spacing={32}>
 					{/*<div className={classes.additionalInputContainer}>*/}
 					{/*	<InputGroup*/}
 					{/*		disabled={isCancelled}*/}
@@ -471,75 +507,134 @@ const TicketDetails = observer(props => {
 					{/*		onBlur={validateFields}*/}
 					{/*	/>*/}
 					{/*</div>*/}
-					<div className={classes.additionalInputContainer}>
+					<Grid className={classes.additionalInputContainer} item xs={12}>
 						<InputGroup
 							disabled={isCancelled}
 							error={errors.description}
 							value={description}
 							name="description"
 							label="Ticket description"
-							placeholder="More details about this ticket type"
+							placeholder="Short description of this ticket type"
 							type="text"
 							onChange={e => {
 								updateTicketType(index, { description: e.target.value });
 							}}
 							onBlur={validateFields}
 						/>
-					</div>
-				</div>
+					</Grid>
+				</Grid>
 
-				<div className={classes.additionalInputsRow}>
-					<div className={classes.additionalInputContainer}>
-						<InputGroup
-							disabled={isCancelled}
-							error={errors.limitPerPerson}
-							value={limitPerPerson}
-							name="maxTicketsPerCustomer"
-							label="Ticket limit"
-							placeholder="10"
-							type="number"
-							onChange={e => {
-								updateTicketType(index, {
-									limitPerPerson: e.target.value
-								});
-							}}
-							onBlur={validateFields}
-						/>
-					</div>
+				<Grid container spacing={32}>
+					<Grid
+						className={classes.additionalInputContainer}
+						item
+						xs={12}
+						sm={6}
+					>
+						<Collapse in={!showMaxTicketsPerCustomer}>
+							<Button
+								variant="additional"
+								onClick={() => {
+									updateTicketType(index, { showMaxTicketsPerCustomer: true });
+								}}
+							>
+								Set max tix per customer
+							</Button>
+						</Collapse>
 
-					<div className={classes.additionalInputContainer}>
-						<InputGroup
-							disabled={isCancelled}
-							error={errors.increment}
-							value={increment}
-							name="increment"
-							label="Increment"
-							placeholder="1"
-							type="number"
-							onChange={e => {
-								updateTicketType(index, { increment: e.target.value });
-							}}
-							onBlur={validateFields}
-						/>
-					</div>
-				</div>
-				<div className={classes.additionalInputsRow}>
-					<div className={classes.additionalInputContainer}>
-						<SelectGroup
-							disabled={isCancelled}
-							value={visibility || "Always"}
-							items={visibilitySelectOptions}
-							name={"visibility"}
-							label={"Visibility *"}
-							onChange={e => {
-								updateTicketType(index, { visibility: e.target.value });
-							}}
-						/>
-					</div>
-				</div>
+						<Collapse in={showMaxTicketsPerCustomer}>
+							<InputGroup
+								disabled={isCancelled}
+								error={errors.limitPerPerson}
+								value={limitPerPerson}
+								name="maxTicketsPerCustomer"
+								label="Max tickets per customer"
+								placeholder=""
+								type="number"
+								onChange={e => {
+									updateTicketType(index, {
+										limitPerPerson: e.target.value
+									});
+								}}
+								onBlur={validateFields}
+							/>
+						</Collapse>
+					</Grid>
+				</Grid>
+
+				<Grid container spacing={32}>
+					<Grid
+						className={classes.additionalInputContainer}
+						item
+						xs={12}
+						sm={6}
+					>
+						<Collapse in={!showVisibility}>
+							<Button
+								variant="additional"
+								onClick={() => {
+									updateTicketType(index, { showVisibility: true });
+								}}
+							>
+								Set visibility/access rules
+							</Button>
+						</Collapse>
+
+						<Collapse in={showVisibility}>
+							<SelectGroup
+								disabled={isCancelled}
+								value={visibility || "Always"}
+								items={visibilitySelectOptions}
+								name={"visibility"}
+								label={"Visibility *"}
+								onChange={e => {
+									updateTicketType(index, { visibility: e.target.value });
+								}}
+							/>
+						</Collapse>
+					</Grid>
+				</Grid>
+
+				<Grid container spacing={32}>
+					<Grid
+						className={classes.additionalInputContainer}
+						item
+						xs={12}
+						sm={6}
+					>
+						<Collapse in={!showCartQuantityIncrement}>
+							<Button
+								variant="additional"
+								onClick={() => {
+									updateTicketType(index, { showCartQuantityIncrement: true });
+								}}
+							>
+								Enforce qty increment
+							</Button>
+						</Collapse>
+
+						<Collapse in={showCartQuantityIncrement}>
+							<InputGroup
+								disabled={isCancelled}
+								error={errors.increment}
+								value={increment}
+								name="increment"
+								label="Cart quantity increment"
+								placeholder=""
+								type="number"
+								onChange={e => {
+									updateTicketType(index, { increment: e.target.value });
+								}}
+								onBlur={validateFields}
+							/>
+						</Collapse>
+					</Grid>
+				</Grid>
 
 				{!showPricing && !isCancelled && saleStartTimeOption !== "parent" ? (
 					<div>
+						<br/>
+						<br/>
 						<FormHeading className={classes.title}>
 							Scheduled Price Changes
 						</FormHeading>
