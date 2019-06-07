@@ -56,7 +56,7 @@ class ViewVenue extends Component {
 					this.setState({ venue: response.data });
 
 					Bigneon()
-						.venues.events.index({ venue_id: id })
+						.events.index({ venue_id: id })
 						.then(response => {
 							const { data, paging } = response.data; //TODO paging
 							const events = [];

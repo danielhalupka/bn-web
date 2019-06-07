@@ -96,6 +96,7 @@ const EventResultCard = ({
 	name,
 	promo_image_url,
 	event_start,
+	event_end,
 	door_time,
 	min_ticket_price,
 	max_ticket_price,
@@ -111,11 +112,15 @@ const EventResultCard = ({
 	}
 	venueTimezone = venueTimezone || "America/Los_Angeles";
 	const eventStartDateMoment = moment.utc(event_start);
+	const eventEndDateMoment = moment.utc(event_end);
 
 	const displayEventStartDate = eventStartDateMoment
 		.tz(venueTimezone)
 		.format("ddd, MMM Do");
 	const displayShowTime = moment(eventStartDateMoment)
+		.tz(venueTimezone)
+		.format("h:mm A");
+	const displayEventEndDate = moment(eventEndDateMoment)
 		.tz(venueTimezone)
 		.format("h:mm A");
 
@@ -139,9 +144,15 @@ const EventResultCard = ({
 							{displayEventStartDate}
 						</Typography>
 					</div>
-					<div className={classes.singleDetail} style={{ textAlign: "right" }}>
-						<Typography className={classes.label}>Showtime</Typography>
+					<div className={classes.singleDetail} style={{ textAlign: "left" }}>
+						<Typography className={classes.label}>Begins</Typography>
 						<Typography className={classes.value}>{displayShowTime}</Typography>
+					</div>
+					<div className={classes.singleDetail} style={{ textAlign: "right" }}>
+						<Typography className={classes.label}>Ends</Typography>
+						<Typography className={classes.value}>
+							{displayEventEndDate}
+						</Typography>
 					</div>
 				</div>
 			</Card>
@@ -154,6 +165,7 @@ EventResultCard.propTypes = {
 	name: PropTypes.string.isRequired,
 	promo_image_url: PropTypes.string,
 	event_start: PropTypes.string.isRequired,
+	event_end: PropTypes.string.isRequired,
 	door_time: PropTypes.string.isRequired,
 	min_ticket_price: PropTypes.number.isRequired,
 	max_ticket_price: PropTypes.number.isRequired,
