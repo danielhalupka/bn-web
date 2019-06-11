@@ -3,6 +3,7 @@ import { withStyles } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import PropTypes from "prop-types";
+import moment from "moment-timezone";
 
 import notifications from "../../../stores/notifications";
 import { fontFamilyDemiBold } from "../../../config/theme";
@@ -38,11 +39,60 @@ class ViewVenue extends Component {
 
 		this.state = {
 			venue: null,
-			events: null
+			events: null,
+			justAnnounced: false
 		};
 	}
 
 	componentDidMount() {
+		const { id } = this.props.match.params;
+
+		Bigneon()
+			.venues.read({ id })
+			.then(response => {
+				this.setState({ venue: response.data });
+				this.loadAllEvents();
+			})
+			.catch(error => {
+				console.error(error);
+				notifications.showFromErrorResponse({
+					error,
+					defaultMessage: "Failed to load venue details."
+				});
+			});
+	}
+
+	loadAllEvents = () => {
+		this.loadEvents("upcoming", upcomingEvents => {
+			this.loadEvents("past", pastEvents => {
+				this.setState(
+					{
+						events: [...upcomingEvents, ...pastEvents]
+					},
+					this.sortEvents.bind(this)
+				);
+			});
+		});
+	};
+
+	sortEvents() {
+		const { events } = this.state;
+		if (!events) {
+			return;
+		}
+
+		const sortedEvents = events.sort((a, b) => {
+			if (moment(a.event_start).diff(moment(b.event_start)) < 0) {
+				return 1;
+			} else {
+				return -1;
+			}
+		});
+
+		this.setState({ events: sortedEvents });
+	}
+
+	loadEvents(past_or_upcoming, callback) {
 		if (
 			this.props.match &&
 			this.props.match.params &&
@@ -51,29 +101,16 @@ class ViewVenue extends Component {
 			const { id } = this.props.match.params;
 
 			Bigneon()
-				.venues.read({ id })
+				.events.index({ venue_id: id, past_or_upcoming })
 				.then(response => {
-					this.setState({ venue: response.data });
-
-					Bigneon()
-						.events.index({ venue_id: id })
-						.then(response => {
-							const { data, paging } = response.data; //TODO paging
-							const events = [];
-							data.forEach(event => {
-								if (event.status === "Published") {
-									events.push(event);
-								}
-							});
-							this.setState({ events });
-						})
-						.catch(error => {
-							console.error(error);
-							notifications.showFromErrorResponse({
-								error,
-								defaultMessage: "Failed to load venue details."
-							});
-						});
+					const { data, paging } = response.data; //TODO paging
+					const events = [];
+					data.forEach(event => {
+						if (event.status === "Published") {
+							events.push(event);
+						}
+					});
+					callback(events);
 				})
 				.catch(error => {
 					console.error(error);
@@ -107,17 +144,39 @@ class ViewVenue extends Component {
 					<EventResultCard
 						{...event}
 						venueTimezone={timezone}
-						max_ticket_price={max_ticket_price}
-						min_ticket_price={min_ticket_price}
+						max_ticket_price={max_ticket_price || 0}
+						min_ticket_price={min_ticket_price || 0}
 					/>
 				</Grid>
 			);
 		});
 	}
 
+	changeJustAnnounced = justAnnounced => {
+		this.setState(
+			{
+				justAnnounced
+			},
+			() => {
+				if (justAnnounced) {
+					this.loadEvents("upcoming", events => {
+						this.setState(
+							{
+								events
+							},
+							this.sortEvents.bind(this)
+						);
+					});
+				} else {
+					this.loadAllEvents();
+				}
+			}
+		);
+	};
+
 	render() {
 		const { classes } = this.props;
-		const { venue } = this.state;
+		const { venue, justAnnounced } = this.state;
 
 		if (venue === null) {
 			return <Loader/>;
@@ -155,13 +214,21 @@ class ViewVenue extends Component {
 						className={classes.filterContainer}
 					>
 						<Typography className={classes.filterLink}>
-							<StyledLink underlined to={`/venues/${id}`}>
+							<StyledLink
+								underlined={!justAnnounced}
+								onClick={this.changeJustAnnounced.bind(this, false)}
+							>
 								Show all
 							</StyledLink>
 						</Typography>
 
 						<Typography className={classes.filterLink}>
-							<StyledLink to={`/venues/${id}`}>Just announced</StyledLink>
+							<StyledLink
+								underlined={justAnnounced}
+								onClick={this.changeJustAnnounced.bind(this, true)}
+							>
+								Just announced
+							</StyledLink>
 						</Typography>
 					</Grid>
 

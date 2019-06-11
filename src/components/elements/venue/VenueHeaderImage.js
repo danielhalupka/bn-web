@@ -78,7 +78,7 @@ const VenueHeaderImage = props => {
 					<Typography className={classes.venueName}>{name}</Typography>
 					<Typography className={classes.address}>{address}</Typography>
 					<div className={classes.socialLinks}>
-						<SocialIconLink
+						{/* <SocialIconLink
 							icon="facebook"
 							size={30}
 							style={{ marginRight: 5 }}
@@ -92,7 +92,7 @@ const VenueHeaderImage = props => {
 							icon="website"
 							size={30}
 							style={{ marginRight: 5 }}
-						/>
+						/> */}
 					</div>
 				</Grid>
 
