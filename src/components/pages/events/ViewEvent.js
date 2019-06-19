@@ -403,9 +403,11 @@ class ViewEvent extends Component {
 
 				<EventDetail classes={classes} iconUrl={"/icons/location-black.svg"}>
 					<Typography className={classes.eventDetailText}>
-						{venue.name}
-						<br/>
-						{addressLineSplit(venue.address)}
+						<Link to={`/venues/${venue.id}`}>
+							{venue.name}
+							<br/>
+							{addressLineSplit(venue.address)}
+						</Link>
 						{venue.googleMapsLink ? (
 							<a target="_blank" href={venue.googleMapsLink}>
 								<span className={classes.eventDetailLinkText}>
